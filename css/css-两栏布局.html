@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .bfc{
+            overflow: hidden;
+        }
+       
+       /* 浮动 */
+        .float-left{
+            float:left;
+        }
+      
+       
+        .ml-210{
+            margin-left:210px;
+        }
+        .ml-10{
+            margin-left:10px;
+        }
+        .mr-10{
+            margin-right:10px;
+        }
+        /* 弹性盒子 */
+        .flex{
+            display: flex;
+        }
+        
+        .flex-right{
+            flex:1
+        }
+        /* 定位 */
+        .relative{
+            position: relative;
+        }
+        .pos-left{
+            position: absolute;
+
+        }
+        .pos-right{
+            position:absolute;
+            left: 210px;
+            top:0;
+            right:0;
+            bottom: 0;
+        }
+        /* 容器部分 */
+        .container{
+            
+            height:200px;
+            border:1px solid darkgreen;
+            
+        }
+        
+        
+        .box-left{
+            width: 200px;
+            height: 200px;
+            background-color:aquamarine;
+        }
+        .box-right{
+            /* width: auto; */
+            height: 200px;
+            background-color: green;
+           
+        }
+        
+    
+        
+        
+
+    </style>
+</head>
+<body>
+    <h2>两栏布局左侧固定右侧自适应</h2>
+    <h3>left:float,right:margin-left=left-width+ml</h3>
+    <div class="container">
+        <div class="box-left float-left"></div>
+        <div class="box-right green ml-210 "></div>
+    </div>
+    <h3>left:float+mr,right:bfc</h3>
+    <div class="container">
+        <div class="box-left float-left mr-10"></div>
+        <div class="box-right green bfc "></div>
+    </div>
+    <h3>flex,左边固定宽度，右边分得剩下部分，边距谁给都行</h3>
+    <div class="container flex">
+        <div class="box-left  "></div>
+        <div class="box-right ml-10 flex-right "></div>
+    </div>
+    <h3>定位左边的box，从文档流中除去，原理和float相同
+    </h3>
+    <div class="container relative">
+        <div class="box-left pos-left "></div>
+        <div class="box-right ml-210 "></div>
+    </div>
+       
+    <h3>定位右边的box，右边没有宽度，所以需要定位清楚四个点的偏移情况
+    </h3>
+    <div class="container relative">
+        <div class="box-left  "></div>
+        <div class="box-right pos-right"></div>
+    </div>
+    
+   
+</body>
+</html>

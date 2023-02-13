@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .bfc{
+            overflow: hidden;
+        }
+       
+       /* 浮动 */
+        .float-left{
+            float:left;
+        }
+        .float-right{
+            float:right;
+        }
+      
+       
+        .ml-210{
+            margin-left:210px;
+        }
+        .mr-210{
+            margin-right:210px;
+        }
+        .ml-10{
+            margin-left:10px;
+        }
+        .mr-10{
+            margin-right:10px;
+        }
+        /* 弹性盒子 */
+        .flex{
+            display: flex;
+        }
+        .flex-m{
+            flex:1;
+            order:1;
+        }
+        .flex-r{
+            order:2;
+        }
+        /* grid */
+        .grid{
+            display: grid;
+            grid-template-columns: 200px auto 200px;
+        }
+        /* 定位 */
+        .relative{
+            position: relative;
+        }
+        .pos-left{
+            position: absolute;
+            left:0;
+            top:0;
+
+        }
+        .pos-right{
+            position:absolute;
+            right: 0;
+            top:0;
+           
+        }
+        /* 块状内联 */
+        .inline{
+            display: inline-block;
+        }
+        /* 容器部分 */
+        .container{
+            
+            height:200px;
+            border:1px solid darkgreen;
+            
+        }
+        
+        
+        .left{
+            width: 200px;
+            height: 200px;
+            background-color:lightgoldenrodyellow;
+        }
+        .right{
+            width: 200px;
+            height: 200px;
+            background-color: lightgreen;
+           
+        }
+        .main{
+            height: 200px;
+            width: auto;
+            background-color: lightblue;
+        }
+        
+    
+        
+        
+
+    </style>
+</head>
+<body>
+    <h2>三栏布局</h2>
+    <h3>左右浮动，main使用左右边距分隔，缺点：main最后加载</h3>
+    <div class="container">
+        
+        <div class="left float-left"></div>
+        <div class="right float-right  "></div>
+        <div class="main  ml-210 mr-210 "></div>
+        
+    </div>
+    
+    <h3>左右绝对定位，main使用左右边距分隔,main可以放在前部</h3>
+    <div class="container relative">
+
+        <div class="main  ml-210 mr-210 "></div>
+        <div class="left pos-left"></div>
+        <div class="right pos-right  "></div>
+        
+        
+    </div>
+    <h2>css3 新特性</h2>
+    <h3>flex(最优雅)，使用order让main布局正确且优先加载，main继承所有剩余的宽度</h3>
+    
+    <div class="container flex">
+
+        <div class="main flex-m ml-10 mr-10 "></div>
+        <div class="left "></div>
+        <div class="right flex-r"></div>
+        
+        
+    </div>
+    <h3>grid,直接在容器上指定纵向的分布宽度</h3>
+    
+    <div class="container grid">
+
+        
+        <div class="left"></div>
+        <div class="main ml-10 mr-10"></div>
+        <div class="right"></div>
+        
+        
+    </div>
+    
+   
+</body>
+</html>

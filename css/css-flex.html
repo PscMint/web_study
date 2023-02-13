@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>flex</title>
+    <style>
+        .flex-container{
+            display:flex;
+            
+            height:200px;
+            width: 300px;
+            border:1px solid darkgreen;
+            margin: auto;
+            
+        }
+        .box-wh{
+            width: 60px;
+            height: 60px;
+            background-color: lightblue;
+        }
+        .box{
+            background-color: lightgreen;
+        }
+        .m-5{
+            margin: 5px;
+        }
+        /* 容器属性 */
+        /* 盒子的排列方向 */
+        .direction{
+            flex-direction: row;
+            /* row(default)|row-reverse|column|column-reverse */
+        }
+        /* 换行 */
+        .wrap{
+            flex-wrap: wrap;
+            /* nowra(default)|wrap|wrap-reverse */
+        }
+        /* 对齐 */
+        /* */
+        .justify{
+            justify-content: space-between;
+            /* flex-start(default) | flex-end | center | space-between | space-around; */
+        }
+        .align{
+            align-items: center ;
+            /* flex-start | flex-end | center | baseline | stretch(default); */
+        }
+        .align-content{
+            align-content: center;
+            /* flex-start | flex-end | center | space-between | space-around | stretch(default) */
+        }
+        /* 子元素属性 */
+        .order-1{
+            order:1;
+        }
+        .order-2{
+            order:2;
+        }
+        .order-3{
+            order:3;
+        }
+        .grow-1{
+            flex-grow: 1;
+        }
+        .grow-2{
+            flex-grow: 2;
+        }
+        .shrink{
+            flex-shrink: 0;
+        }
+        .basis{
+            flex-basis: 150px;
+        }
+        .align-self{
+            align-self: center;
+        }
+      
+
+        
+    </style>
+</head>
+<body>
+<h2>flex的使用</h2> 
+<h3>flex-direction:调节.direction的属性可以知道各个属性的方向</h3>   
+<div class="flex-container direction">
+    <div class="box-wh m-5">1</div>
+    <div class="box-wh m-5">2</div>
+    <div class="box-wh m-5">3</div>  
+</div>
+<h3>flex-wrap:默认情况下盒子都排布在一条轴线上，需要flex-wrap换行</h3>
+<div class="flex-container wrap">
+    <div class="box-wh m-5">1</div>
+    <div class="box-wh m-5">2</div>
+    <div class="box-wh m-5">3</div> 
+    <div class="box-wh m-5">4</div>
+    <div class="box-wh m-5">5</div>
+    <div class="box-wh m-5">6</div>   
+</div>
+
+<h3>justify-content：控制子元素在主轴（水平轴）上的排布方式 </h3>     
+<div class="flex-container justify">
+    <div class="box-wh m-5">1</div>
+    <div class="box-wh m-5">2</div>
+    <div class="box-wh m-5">3</div>
+</div>
+
+<h3>align-items：控制一条主轴线在交叉轴（纵轴）上的排布位置 </h3>     
+<div class="flex-container align">
+    <div class="box-wh m-5">1</div>
+    <div class="box-wh m-5">2</div>
+    <div class="box-wh m-5">3</div>
+</div>
+<h3>align-content属性定义了多根轴线的对齐方式，确定了多条轴线在交叉轴的位置。如果项目只有一根轴线，该属性不起作用。</h3>
+<div class="flex-container wrap align-content">
+    <div class="box-wh m-5">1</div>
+    <div class="box-wh m-5">2</div>
+    <div class="box-wh m-5">3</div>
+    <div class="box-wh m-5">4</div>
+    <div class="box-wh m-5">5</div>
+    <div class="box-wh m-5">6</div>
+    <div class="box-wh m-5">7</div>
+</div>
+<h3>order</h3>
+<div class="flex-container">
+    <div class="box-wh m-5 order-3">1(w=3)</div>
+    <div class="box-wh m-5 order-1" >2(w=1)</div>
+    <div class="box-wh m-5 order-2">3(w=2)</div>
+</div>
+<h3>flex-grow：按比例分配剩余的空间。</h3>
+<div class="flex-container">
+    <div class="box-wh m-5 "></div>
+    <div class="box m-5 grow-1" ></div>
+    <div class="box m-5 grow-2"></div>
+</div>
+<div class="flex-container">
+    <div class="box m-5 grow-1"></div>
+    <div class="box m-5 grow-1" ></div>
+    <div class="box m-5 grow-2"></div>
+</div>
+<h3>flex-shrink:如果所有项目的flex-shrink属性都为1(1是默认值)，当空间不足时，都将等比例缩小。如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小。</h3>
+<div class="flex-container">
+    <div class="box-wh m-5 shrink "></div>
+    <div class="box-wh m-5 " ></div>
+    <div class="box-wh m-5 "></div>
+    <div class="box-wh m-5 "></div>
+    <div class="box-wh m-5 " ></div>
+    <div class="box-wh m-5 "></div>
+    <div class="box-wh m-5 "></div>
+    <div class="box-wh m-5 " ></div>
+    <div class="box-wh m-5 "></div>
+</div>
+<h3>flex-basis项目占据固定的空间</h3>
+<div class="flex-container">
+    <div class="box m-5 basis">box-a</div>
+    <div class="box m-5">box-b</div>
+   
+</div>
+<div class="flex-container">
+    <div class="box-wh m-5 basis">box-a</div>
+    <div class="box-wh m-5">box-b</div>
+   
+</div>
+<h3>aglin-self子项目单独设定位置</h3>
+<div class="flex-container">
+    <div class="box-wh m-5">box-a</div>
+    <div class="box-wh m-5 align-self">box-b</div>
+    <div class="box-wh m-5">box-c</div>
+   
+</div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .bfc{
+            overflow: hidden;
+        }
+       
+       /* 浮动 */
+        .float-left{
+            float:left;
+        }
+        .float-right{
+            float:right;
+        }
+      
+       
+        
+        /* 边距设置 */
+        .m-0{
+            margin: 0;
+        }
+        .m-auto{
+            margin:auto;
+        }
+        /* 弹性盒子 */
+        .flex{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flex-m{
+            flex:1;
+            order:1;
+        }
+        .flex-r{
+            order:2;
+        }
+        /* grid */
+        .grid{
+            display: grid;
+            
+        }
+        /* table */
+        .table{
+            display: table;
+
+        }
+        /* 定位 */
+        .relative{
+            position: relative;
+        }
+        .pos-1{
+            position: absolute;
+            left:50%;
+            top:50%;
+            transform:translate(-50%,-50%)
+            
+        }
+        .pos-2{
+            position: absolute;
+            left:50%;
+            top:50%;
+            margin-left: -50px;
+            margin-top: -50px;
+            
+
+        }
+        .pos-right{
+            position:absolute;
+            right: 0;
+            top:0;
+           
+        }
+        /* 设置行高 */
+        .line-height{
+            line-height: 200px;
+        }
+        /* 文字水平居中 */
+        .text-center{
+            text-align: center;
+        }
+        /* 块状内联 */
+        .inline{
+            display: inline-block;
+        }
+        /* 容器部分 */
+        .container{
+            
+            height:200px;
+            border:1px solid darkgreen;
+            
+        }
+        
+        
+       .box,.box-wh{
+            
+            background-color: lightgreen;
+       }
+       .box-wh{
+            width: 100px;
+            height: 100px;
+       }
+    
+        
+        
+
+    </style>
+</head>
+<body>
+    <h2>最通用居中，经典好用</h2>
+
+    <h3>定位+transform</h3>
+    <div class="container relative">
+        <div class="box-wh pos-1"></div>
+    </div>
+    <h3>flex</h3>
+    <div class="container flex">
+        <div class="box-wh"></div>
+    </div>
+
+    <h3>grid</h3>
+    <div class="container grid ">
+        <div class="box-wh m-auto"></div>
+    </div>
+
+    <h2>box有宽度和高度，居中在container中</h2>
+    <h3>定位+margin负值（取盒子宽高的一半）调整位置</h3>
+    <div class="container relative">
+        <div class="box-wh pos-2"></div>
+    </div>
+    <h3>文字在div中居中：水平text-aglin，垂直设置为行高=盒子高度</h3>
+    <div class="container ">
+        <div class="line-height  text-center" >12345</div>
+    </div>
+    
+ 
+   
+</body>
+</html>

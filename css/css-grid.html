@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grid</title>
+    <style>
+        .center{
+            text-align:center;
+        }
+        .container{
+            
+            height:200px;
+            width: 300px;
+            border:1px solid darkgreen;
+            margin: auto;
+            
+        }
+        
+        
+        .box{
+            
+            background-color:lightblue;
+        }
+        
+        /* grid */
+        .grid-basic{
+            display: grid;
+           
+            /* 绝对宽度 */
+            grid-template-columns: 100px 100px 100px;
+             /* 相对分配 */
+             grid-template-columns: 1fr 2fr 1fr;
+             /* 设置网格元素之间的间距 */
+             column-gap: 5px;
+             row-gap: 10px;
+
+        }
+        /* layout */
+        .grid-layout{
+            display: grid;
+            grid-template-areas: 
+            "header header header"
+            "sidebar content content"
+            "footer footer footer";
+            grid-template-rows: 1fr 4fr 1fr;
+        }
+        main{
+            grid-area: content;
+            background-color: lightcyan;
+        }
+        aside{
+            grid-area: sidebar;
+            background-color: lightseagreen;
+        }
+        header{
+            grid-area:header;
+            background-color: lightgreen;
+        }
+        footer{
+            grid-area: footer;
+            background-color: lightblue;
+        }
+        /* box有宽高的对齐问题 */
+        .box-wh{
+            width: 80px;
+            height: 60px;
+            background-color: lightgreen;
+        }
+        .grid-center{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            
+            align-items: center;
+            justify-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>grid</h2>
+    <h3 class="center">grid是方便多个box在一个container中以网格的形式排布，将container的空间分配完，所以box本身有宽高反而不好计算</h3>
+    <div class="container grid-basic">
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        
+    </div>
+    <h3 class="center">使用grid实现网页常用布局</h3>
+    <div class="container grid-layout">
+        <header>header</header>
+        <main>content</main>
+        <aside>sidebar</aside>   
+        <footer>footer</footer>
+    </div>
+    <h3 class="center">对于有宽高的box，需要在自己的grid中居中可以使用align-items&
+        justify-items两个属性</h3>
+    <div class="container grid-center">
+        
+        <div class="box-wh"></div>
+        <div class="box-wh"></div>
+        <div class="box-wh"></div>
+        <div class="box-wh"></div>
+        <div class="box-wh"></div>
+        <div class="box-wh"></div>
+    </div>
+    
+</body>
+</html>
