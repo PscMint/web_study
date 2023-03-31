@@ -6,11 +6,11 @@ const target = {
     },
     field4: [2, 4, 8]
 };
-function deepClone(target,map=new Map()){
+function deepClone(target,map=new weakMap()){
     if(typeof target=="object"){
         let object=Array.isArray(target)?[]:{};
         if(map.get(target)){
-            return target;
+            return map.get(target);
         }
         map.set(target,object);
         for(let key in target){

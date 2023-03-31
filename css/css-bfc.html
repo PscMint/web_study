@@ -6,13 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+	*{
+	margin:0;
+	}
         .bfc{
             overflow: hidden;
         }
         .container{
             
             border: 2px solid darkgreen;
-            margin: 1px;
+            
         }
         .float{
             float:left;
@@ -45,6 +48,7 @@
             width: 200px;
             height: 200px;
             background-color:aquamarine;
+			border: 2px solid darkgreen;
         }
         .green{
             background-color: green;
@@ -54,18 +58,22 @@
             height: 100px;
         }
         
-        
+	.clear{
+		clear:both;
+	}
 
     </style>
 </head>
 <body>
-    <div class="container bfc ">
-    </div>
-    <div class="box float">
-    <div class="box green margin-10"></div>
-   </div>
-       
-    
+	<div >
+	<div class="float box"></div>
+	<div class="clear"></div>
+	</div>
+	<div class="box float" style="background-color:blue;width:500px;height:500px" ></div>
+	
+	
+</div>
+
     
    
 </body>

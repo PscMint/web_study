@@ -26,7 +26,6 @@ function debounce(func,wait,immediate){
                 //可能会有返回值，在这里返回
                 res=func.apply(context,args);
             }
-
         }
         else{
             //指定func的this指向container

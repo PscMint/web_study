@@ -1,19 +1,345 @@
+## css-基础
+
+### 布局
+
+#### 流式布局
+
+文档流是在默认情况下浏览器所遵循的页面布局方式，文档中的元素按顺序依次排列，通过它们的类型和CSS属性决定它们在页面上的位置和大小。
+
+- 块级元素在页面上换行，默认宽度为100%，默认没有高度
+
+- 内联元素不换行，只占据它所包含内容的大小
+
+注：可以通过设置元素的display属性来决定元素是块级内联或是其他
+
+#### 浮动
+
+浮动使得元素脱离文档流，而浮动到父元素的左边或右边。
+
+块级元素会忽略的浮动元素，内联元素会避开浮动元素。
+
+#### 定位
+
+- absolute 绝对定位，以设置了position非默认值的最近父元素的左上角为偏移对象，可以设定上下左右的偏移长度
+- relative 相对定位，如果在自己上面设定偏移，就是相对自己本身来偏移
+- fixed 相对浏览器的视窗左上角进行偏移
+- static 是定位属性position的默认值
+- ==sticky==
+
+### 弹性盒子Flex
+
+1. 在父容器中首先声明是弹性盒子`display:flex`，之后可以声明关于盒子内元素布局的一些属性
+   - justify-content 控制元素横轴布局：space-between|space-around
+   - align-items 控制元素纵轴布局（1条纵轴）：center
+   - align-content控制纵轴之间的布局方式（2及2以上纵轴）：center|space-between
+   - flex-direction 控制元素排列的方向：row|column
+   - flex-wrap 控制元素是否换行：wrap-reserve（向上换行）|wrap（向下换行）
+   
+2. 盒子内部的子元素的设置
+   - order 控制元素在布局中出现的顺序，order数值越小，越靠前排列
+   
+   - flex-grow 元素所占的宽度按比例排布；grow值为0这个盒子的宽度不会发生改变。
+   
+     一种常见情况：如果某个元素有设定宽度（basis有值，shrink和grow默认为0），则剩余的宽度给其他元素（它们设定了grow的值）按比例分配。
+   
+   - flex-shrink 在宽度不够的情况下（盒子累加宽度>容器宽度），将按比例缩小盒子的宽度。如果将flex-shrink值为0这个盒子的宽度不会发生改变。
+   
+   - `flex-basis`是CSS Flexbox布局属性之一，它用于设置flex项目在主轴方向上的初始尺寸，也就是flex项目的基础尺寸。它可以设置一个长度值（如px、em、rem等），也可以使用关键字auto、content、或者一个百分比值。具体来说，`flex-basis`决定了一个flex项目的默认大小，它的作用类似于`width`属性，但是不同的是，`flex-basis`属性只影响flex项目的初始尺寸，而不影响它们的最终尺寸。
+   
+     当`flex-basis`被设置为一个固定长度值时，它会强制指定flex项目的宽度。例如，当`flex-basis: 100px`时，那么该flex项目的宽度将被固定为100px。
+   
+     当`flex-basis`被设置为auto时，flex项目的基础尺寸将根据其内容自动计算得出。
+   
+     当`flex-basis`被设置为content时，flex项目的基础尺寸将根据其内容和内边距自动计算得出。
+   
+     当`flex-basis`被设置为百分比时，flex项目的基础尺寸将根据flex容器的主轴长度计算得出。例如，当`flex-basis: 50%`时，该flex项目的基础尺寸将为flex容器主轴长度的50%。
+   
+     需要注意的是，`flex-basis`属性只在flex项目未被放大或缩小前生效。==如果`flex-grow`或`flex-shrink`属性被设置为非0值，那么它们会根据比例进行放大或缩小，而不再受`flex-basis`属性的限制。==因此，`flex-basis`属性的作用类似于`width`属性，但并不完全相同。
+
+### BFC
+
+<img src=".\ref_img\bfc.jpg" alt="lifecycle" style="zoom: 67%;" />
+
+<img src=".\ref_img\clear.jpg" alt="clear" style="zoom: 67%;" />
+
+### 重排重绘
+
+<img src=".\ref_img\浏览器渲染.jpg" alt="浏览器渲染" style="zoom: 67%;" />
+
+### css优化
+
+1. 压缩CSS文件，可以使用工具如CSSMin和CSSNano来压缩CSS文件，减少文件大小。
+2. 使用外部CSS文件，将CSS代码放在外部文件中，可以使HTML文档更简洁，同时也方便维护。
+3. 避免使用@import，它会导致页面加载时间延长。
+4. 选择器优化，尽可能减少选择器的层级和数量，以提高页面渲染速度。
+5. 使用缓存，可以使用浏览器缓存来减少页面加载时间，例如设置Expires和Cache-Control响应头。
+6. 使用CSS动画代替JavaScript动画，可以提高性能，因为CSS动画是通过GPU加速来实现的。
+7. 使用字体图标代替图片，可以减少网络请求和文件大小。
+
+### 选择器
+
+#### 常见的选择器
+
+| 选择器         | 描述                                          | 示例                                                        |
+| -------------- | --------------------------------------------- | ----------------------------------------------------------- |
+| 标签选择器     | 通过HTML元素标签名选择元素                    | `p`选择所有段落元素                                         |
+| 类选择器       | 通过类名选择元素                              | `.example`选择所有带有`example`类的元素                     |
+| ID选择器       | 通过元素ID选择元素                            | `#main`选择ID为`main`的元素                                 |
+| 子元素选择器   | 选择指定元素的直接子元素                      | `ul > li`选择所有`ul`元素下的直接子元素`li`                 |
+| 后代选择器     | 选择指定元素的后代元素                        | `ul li`选择所有`ul`元素下的后代`li`                         |
+| 相邻兄弟选择器 | 选择指定元素的相邻兄弟元素                    | `h1 + p`选择紧随在`h1`元素后的`p`元素                       |
+| 通用选择器     | 选择所有元素                                  | `*`选择页面中所有元素                                       |
+| 属性选择器     | 根据元素的属性选择元素                        | `input[type="text"]`选择所有`type`属性为`text`的`input`元素 |
+| 伪类选择器     | 根据元素的状态选择元素                        | `:hover`选择鼠标悬停在元素上的元素                          |
+| 伪元素选择器   | 选取元素的特定部分，如`::before`和`::after`等 | `p::before`选择`p`元素内容前插入的伪元素                    |
+
+### 优先级计算规则
+
+- 打分规则：内联**1000**-id**100**-类选择器&属性选择器&伪类选择器**10**-标签选择器&伪元素选择器**1**，得分高的选择器被应用
+- 伪类选择器等同于类选择器，伪元素选择器等同于标签选择器。伪类就是展现了元素的状态，伪元素是对应元素的局部。
+- important！是用来覆盖内联样式的
+- 相同分数的情况下，后面的样式规则覆盖前面的样式规则
+
+### 盒模型
+
+- 标准盒模型：设定的宽高是content的宽高（对于盒子的不同位置精确设置，互不影响，不需要通过宽高设置反推content、padding、border的大小）
+- IE盒模型：设定的宽高是content+padding+border一起的长度（IE6这样的老古董才默认使用IE盒模型）
+- 修改盒模型的方法：`box-sizing:content-box(标准盒模型)|border-box（ie盒模型）`
+
+### 单位、百分比
+
+#### rem em
+
+它们都是相对的长度单位，因此可以用来实现响应式布局
+
+- `em` 是相对于父元素的字体大小计算的。例如，如果父元素的字体大小为 `16px`，那么 `1em` 等于 `16px`。
+- `rem` 是相对于根元素（即 `<html>` 元素）的字体大小计算的。例如，如果根元素的字体大小为 `16px`，那么 `1rem` 等于 `16px`。
+
+#### vw vh
+
+同样也是适用于响应式布局，使得网页在不同尺寸的屏幕上可以适应
+
+- vw: 视口宽度的1/100，例如1vw等于视口宽度的1%。
+- vh: 视口高度的1/100，例如1vh等于视口高度的1%。
+
+#### 百分比
+
+在子元素中设置百分比，都是参考父元素的大小，这同样是为了页面的响应式布局，具体来说：
+
+1. 如果将元素的字体大小设置为百分比，那么它将是元素父元素字体大小的百分比。
+2. 如果使用百分比作为宽度值，那么它将是父值宽度的百分比。
+
+#### 一些比较简单的使用建议
+
+1. 宽度和高度的设置
+
+- 如果父元素的宽度和高度已知，可以使用像素值或其他固定单位来设置子元素的宽度和高度。
+- 如果父元素的宽度和高度未知，或者需要实现响应式布局，可以使用百分比或其他相对单位（如vw、vh、em等）来设置子元素的宽度和高度。这样可以让子元素根据父元素的尺寸进行相应的调整，适应不同的设备和屏幕尺寸。
+
+2. 字体大小的设置
+
+- 如果需要确保字体大小在不同设备上显示相同的物理大小，可以使用绝对单位（如pt或px）来设置字体大小。
+- 如果需要实现响应式布局，可以使用相对单位（如em、rem或vw等）或百分比来设置字体大小。这样可以让字体大小根据其容器的尺寸进行相应的调整，适应不同设备和屏幕尺寸。
+
+### css3新特性
+
+#### transition过渡
+
+- 本质：是一个css属性，用来实现在一段时间内平滑地改变元素的css属性值。
+
+- 常见的应用场合：元素设置了动画、对元素使用了伪类选择器等。在上述的场景下，都发生了元素css属性的变化，而transition是这种变化更加自然。
+
+- 用法
+
+  transition: 
+
+  transition-property（需要过渡的css属性） |
+
+  transition-duration （过渡时间）|
+
+  transition-timing-function（运动曲线）| 
+
+  transition-delay（开始时间）;
+
+- 运动曲线
+
+  `transition-timing-function` 属性用于指定过渡的速度曲线，它可以由`cubic-bezier` 函数来自定义一个三次贝塞尔曲线，或者使用阶跃函数（如 `steps()`）来定义一个阶梯状的速度曲线。
+
+  此外，linear、ease、ease-in、ease-out、ease-in-out是一些常用的贝塞尔曲线，具有以下的效果：
+
+  - `linear`: 过渡效果以相同速度开始至结束。
+  - `ease`: 默认值。过渡效果以低速开始，然后加快，在结束前变慢。
+  - `ease-in`: 过渡效果以低速开始。
+  - `ease-out`: 过渡效果以低速结束。
+  - `ease-in-out`: 过渡效果以低速开始和结束。
+
+#### 阴影
+
+##### box-shadow
+
+【本质】
+
+是对于元素阴影效果进行设置。参考现实中的阴影，它的初始影子类似于正向投影和元素本身大小相同，之后它的位置和清晰程度会因为“光源”的投射角度和方式有所不同，因而引申出对于它下列属性的设置，目的是为了模拟出不同的投射效果。
+
+【掌握基本写法】
+
+`box-shadow: 10px 5px 5px 0px red;`分别是X轴偏移量、Y轴偏移量、模糊半径、扩散半径和颜色，如果有一个方向上没有，请写上0。
+
+每一个位置上的参数含义：
+
+1. x轴位移
+
+2. y轴位移
+
+- 注意这个位移并不会改变尺寸，阴影和图形尺寸相等
+- 当位移值为正数，向右，向下偏移；当位移值为负数，向左，向上偏移
+
+3. 模糊半径，在四个方向上同时将边缘模糊，同时也会增加尺寸，它只能为正值
+4. 扩张半径，在四个方向上同时扩大(当它为正值)，或者缩小(当它为负值)阴影的尺寸
+5. 阴影的颜色
+
+恢复记忆：[box-shadow ](https://developer.mozilla.org/zh-CN/docs/Web/CSS/box-shadow)
+
+【box-shadow技巧】
+
+1. 盒子可以增加不止一个投影，以实现双侧投影的效果，用`,`分隔即可
+2. 使用inset属性可以让阴影落在盒子内部
+
+##### text-shadow
+
+没有扩散半径，其他和box-shadow基本一致
+
+```css
+/* offset-x | offset-y | blur-radius | color */
+p{
+    text-shadow: 1px 1px 2px black;
+}
+
+```
+
+后期学习：渐变、动画、变换等
+
+### 媒体查询
+
+1. 本质作用：`@media`可以选中媒体类型，以此来实现针对这特定的媒体和它的不同状态，应用需要的样式
+
+2. 媒体类型：screen（默认的媒体类型）|print|speech
+
+3. 常用场景：使用媒体查询完成响应式布局
+
+```css
+/*页面大于900px应用*/
+@media screen and (min-width: 900px) {
+  article {
+    padding: 1rem 3rem;
+  }
+}
+```
+
+4. 框架中的响应式布局实现（element-ui）
+
+通过sm、md、lg等属性以及span的值可以映射到element-ui中预先设定好的类，当屏幕出于特定大小的时候，相应的类会动态地添加到元素上
+
+而这些预先设定好的类，是经过了媒体查询的，因此可以实现响应式布局
+
+```css
+@media (max-width: 599px) {
+  .el-col--xs-24 {
+    width: 100%;
+  }
+  .el-col--xs-23 {
+    width: 95.83333333%;
+  }
+  /* ... */
+}
+@media (min-width: 600px) and (max-width: 1199px) {
+  .el-col--sm-24 {
+    width: 100%;
+  }
+  .el-col--sm-23 {
+    width: 95.83333333%;
+  }
+  /* ... */
+}
+@media (min-width: 1200px) and (max-width: 1919px) {
+  .el-col--md-24 {
+    width: 100%;
+  }
+  .el-col--md-23 {
+    width: 95.83333333%;
+  }
+  /* ... */
+}
+/* ... */
+```
+
+
+
+---
+
+## 前端手写清单
+
+在附近的文件夹实现了
+
+### js部分
+
+- 深拷贝
+- 节流
+- 防抖
+- 去重
+- reduce实现
+- call、apply、bind、new实现
+- promise手写
+- instanceof
+- flatten
+- 调度器
+
+### css部分
+
+- 两栏布局
+- 三栏布局
+- 实现居中的方案
+
 ## js-原理
 
 ### 原型链
 
-自顶向下
+原型链的本质：
+
+原型链是js中的一种设计，目的是为了实现js对象的封装、继承、多态的特性。
+
+对于原型链设计的理解：
 
 1. 顶层对象：js中设计了Object.prototype和它的构造函数Object
    - 对象原型没有进一步的源头了，所以`Object.prototype.__proto__==null`
    - 对象构造器是一个构造器对象，所以`Object.__proto__==Function.prototype`
+
 2. 顶层构造器：js中设计了Function.prototype和它的构造函数Function
    - 由于它本身也是对象，`Function.prototype.__proto__==Object.prototype`
    - 函数构造器是一个构造器对象，所以`Function.__proto__==Function.prototype`
 
 3. 普通对象：每个对象都有`__proto__`属性（原型链属性，js中的非标准属性，可以使用Object.getPrototypeOf获得），它指向对象的原型对象，也可以理解为是对象的构造函数的prototype所指向的对象。
-4. 构造器：构造器不仅有`__proto__`属性，同时也有`prototype`属性，前者指向构造器作为一个对象本身，这个对象的原型，后者指向构造器构造出来的对象的原型对象。
-5. 对象原型：对象原型包含了对象可以使用的属性和方法。
+
+4. 原型对象：原型对象的`__proto__`属性指向它父类的原型对象，实现了js中的继承，原型对象中包含了对象可以使用的属性和方法。
+
+5. 构造器：构造器不仅有`__proto__`属性，同时也有`prototype`属性，前者指向函数原型对象，后者指向构造器构造出来的对象的原型对象。
+
+
+原型链的应用:
+
+1. new操作符的执行流程
+
+   a. JavaScript 引擎会创建一个新对象，并将该对象的原型指针指向构造函数的 prototype 对象。
+
+   b. JavaScript 引擎会使用 apply 方法调用构造函数，并传入新创建的对象作为 this 参数。这样一来，我们就可以在构造函数内部使用 this 关键字来初始化新对象的属性。
+
+   c. JavaScript 引擎会返回新创建的对象。
+
+2. Object.create(proto)的执行流程
+
+   1. 创建一个新对象
+   2. 将该对象的原型指针指向我们传入的原型对象
+   3. 返回新对象
 
 ## Vue-basic
 
@@ -23,11 +349,21 @@
 
 ### single page application
 
-含义：SPA是一种构建web应用的方式，它只有一个页面和一些必要的静态资源，其他的内容都是通过js动态生成的。
+【含义】
 
-例子：SPA 通过路由机制，将页面的不同部分（视图）映射到不同的组件，实现了在同一个 HTML 页面内动态地加载不同的组件，从而达到切换页面的效果。
+SPA是一种构建web应用的方式，它只有一个页面和一些必要的静态资源，其他的内容都是通过js动态生成的。
 
-优点：用户体验好，局部刷新方便更快交互；缺点：不利于seo
+【例子】
+
+本质：SPA 通过路由机制，将页面的不同部分映射到不同的组件，实现了在同一个 HTML 页面内动态地加载不同的组件，从而达到切换页面的效果。
+
+实现方法：vue-router实现路由功能通过监听HTML5的hashchange事件，该事件会在URL的#后面部分改变后触发，之后把相应的组件在<router-view>标签处渲染，并加载需要的资源
+
+【特点】
+
+优点：用户体验好，局部刷新方便更快交互，不需要给服务器发送请求；
+
+缺点：不利于seo
 
 ### MVVM & MVC
 
@@ -49,6 +385,8 @@
 
 ### vue修饰符
 
+本质：将很多常用、有用的dom处理总结，形成了vue修饰符，以此改变事件处理程序的行为。
+
 | 修饰符              | 作用                                                   |
 | ------------------- | ------------------------------------------------------ |
 | lazy                | 懒加载，等到停止输入内容（光标离开input）再更新value值 |
@@ -68,7 +406,7 @@
 
 ### vue指令
 
-Vue的v指令是用来添加响应式行为和绑定数据的。这些指令的共同性在于它们都可以用来操作DOM，根据指令的不同，可以实现不同的功能。
+Vue的v指令可以用来操作DOM，根据指令的不同，可以实现不同的功能。
 
 1. v-bind(:)——实现vue实例数据流向dom元素属性，常用于绑定dom动态属性
 2. v-on(@)——实现将dom元素事件绑定到vue实例中，用于设置事件处理程序
@@ -82,6 +420,32 @@ Vue的v指令是用来添加响应式行为和绑定数据的。这些指令的�
 
 - v-if值的切换会导致组件重复地跑声明周期，所以用于按照逻辑渲染，后期不用频繁切换的场景
 - v-show只是在页面上隐藏渲染好的节点，应用于频繁切换的场景
+
+### 自定义v指令
+
+自定义指令可以用于实现一些常见的功能，比如：
+
+- 控制 DOM 的行为和样式
+- 处理表单控件的交互行为
+- 扩展 Vue 组件的功能
+
+自定义指令可以通过调用 `app.directive(name, definition)` 来定义一个指令，其中 `name` 是指令的名称，`definition` 是指令的定义对象。
+
+指令的定义对象可以包含以下属性，生命周期钩子，也就是在这个声明周期可以访问到的对象：
+
+- `beforeMount`：在绑定元素的初始值时调用，只调用一次。
+- `mounted`：在绑定元素的子节点都被插入后调用，只调用一次。
+- `beforeUpdate`：在元素更新前调用，可能会被调用多次。
+- `updated`：在元素更新后调用，可能会被调用多次。
+- `beforeUnmount`：在指令所绑定的元素被销毁前调用，只调用一次。
+- `unmounted`：在指令所绑定的元素被销毁后调用，只调用一次。
+
+它们可以接收的参数为`el, binding, vnode, prevVnode`
+
+- el：绑定的dom元素，可以进行dom操作
+- binding：是一个对象，包括很多和指令相关的属性
+
+案例：制作防抖按钮，在按钮的mounted周期绑定一个点击事件的防抖包装，作为Handler，在按钮的unmounted周期将这个Handler销毁。
 
 ### 组件间传值的方式
 
@@ -101,9 +465,13 @@ Vue的v指令是用来添加响应式行为和绑定数据的。这些指令的�
 
 可以通过动态地绑定（v-bind）class和style属性，可以给他们绑定关于class和style的对象或数组
 
+如果要实现样式的动态切换，可以考虑绑定一个计算属性，按需返回需要绑定的样式
+
 ### computed和watch的区别
 
-1.`computed`是依赖已有的变量来计算一个目标变量，大多数情况都是`多个变量`凑在一起计算出`一个变量`，并且`computed`具有`缓存机制`，依赖值不变的情况下其会直接读取缓存进行复用，`computed`不能进行`异步操作`
+1.`computed`是依赖已有的变量来计算一个目标变量，大多数情况都是`多个变量`凑在一起计算出`一个变量`，它也是响应式的。当计算属性所依赖的响应式数据发生变化时，计算属性会重新计算，从而更新视图。并且`computed`具有`缓存机制`，依赖值不变的情况下其会直接读取缓存进行复用，`computed`不能进行`异步操作`
+
+原因：`computed`是基于响应式数据进行计算的，并且在计算过程中必须是同步的。如果`computed`包含异步操作，由于异步操作的结果是不确定的，因此`computed`的计算结果也是不确定的，会导致无法计算。
 
 2.`watch`是监听某一个变量的变化，并执行相应的回调函数，通常是`一个变量`的变化决定`多个变量`的变化，`watch`可以进行`异步操作`
 
@@ -127,12 +495,9 @@ vue组件会经历的一系列初始化步骤，允许开发者在需要的阶�
 
 解决方案：在computed中使用filter将需要渲染的节点选出来，在进行for循环
 
-### ==自定义v指令==
+### vuex简介
 
-1. 了解整套注册流程
-2. 案例实现防抖按钮 
-
-### vuex的属性和作用
+vuex本质：Vuex是一个专为Vue.js应用程序开发的状态管理模式，它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。
 
 - state：统一管理应用状态的对象。
 
@@ -165,8 +530,12 @@ vue组件会经历的一系列初始化步骤，允许开发者在需要的阶�
    <student v-slot="slotProps">
        {{slotProps.name}}-{{slotProps.age}}
    </student>
-   //具名插槽使用下面语句
-   #slot-name="slotProps"
+   //具名插槽
+   //子组件
+   <slot name="header">
+   //父组件
+    <h2 #header></h2>
+    <h2 v-slot:header></h2>
    ```
 
 【大致解析原理】
@@ -181,7 +550,9 @@ vue组件会经历的一系列初始化步骤，允许开发者在需要的阶�
 
 ### 在v-for中，为什么不建议用index做key
 
-因为index在数组中的数据项增加或减少的时候，都会可能会发生改变（unshift、shift）。而使用id，这种固定不变且唯一的属性就非常合适。所以不要选择容易改变的属性作为key
+因为vue通过diff算法来更新视图，而diff算法会通过比较两个节点的key值来判断两个节点是否为同一个节点。而使用index作为key之后，如果发生队头修改的操作，会改变所有节点的key，导致本来应该判断为相同的节点判断失败，耗费了性能。
+
+index在数组中的数据项增加或减少的时候，都会可能会发生改变（unshift、shift）。而使用id，这种固定不变且唯一的属性就非常合适。所以不要选择容易改变的属性作为key。
 
 ### nextTick的用处
 
@@ -248,25 +619,6 @@ vue组件会经历的一系列初始化步骤，允许开发者在需要的阶�
 
 ## Vue3
 
-### vue3的响应式变量应用
-
-1. 为什么要使用reactive函数？
-
-   vue3项目中，onMounted之后就完成了页面dom的渲染，此时再去修改组件的某些值也无法实现在页面上的重新渲染。
-
-   当我们需要页面随着数据的改变而重新进行局部的渲染，则需要吧这些数据声明为响应式的
-
-2. reactive的原理简单理解？
-
-   Reactive 实现的原理是通过 Object.defineProperty 在对象属性 getter 和 setter 方法上==添加依赖追踪==，通过闭包来==捕获并管理依赖关系==。当对象中某个属性的值发生变化时，setter 会==通知观察者并触发重新渲染==。
-
-   观察者模式：观察者模式是一种设计模式，它定义了对象之间的一对多关系，当一个对象改变状态时，他的所有依赖都将收到通知并自动更新。主体和观察者之间形成了一种松耦合的关系，因此观察者可以动态地注册和注销，而不会影响到主体的其他部分。
-
-3. reactive和ref
-
-   - ref: ref 是一个响应式的单个值，它可以通过 .value 属性读写数据。
-   - reactive: reactive 是一个响应式对象，它可以包含多个值，通过读写对象属性来读写数据。
-
 ### vue3的单向数据流
 
 1. 循环更新
@@ -298,19 +650,223 @@ vue组件会经历的一系列初始化步骤，允许开发者在需要的阶�
 
    当某个组件被卸载时，在它上面安装的监听器也应该被移除，否则当大量的监听器都没能及时清除的时候可能会导致内存的泄漏
 
-## webpack
+## Vue-原理
 
+### vue的响应式前置知识-Proxy
+
+|                      | proxy                                                        |
+| -------------------- | ------------------------------------------------------------ |
+| 创建的本质原因       | proxy是ES6的一个内置对象。proxy改变了对象的默认行为，在对象的某些默认行为发生时可以执行自定义的逻辑。因此可以用它来包装对象，作为对象的代理。 |
+| 特质                 | 我们应该在所有地方使用 `proxy` 而不是 `target`。代理没有自己的属性或方法。如果提供了捕捉器（trap），它将捕获操作，否则会将其转发给 `target` 对象。 |
+| 设计层面             | let proxy = new Proxy(target, handler)//创建代理的方式<br />拦截器的参数：target目标对象，prop目标对象的属性，receiver确定原始操作所在的目标对象<br />拦截器的种类，对象的常用的内建函数和拦截器相互对应 |
+| 存在的问题（待补充） | 内建对象具有“内部插槽”，对这些对象的访问无法被代理。<br />对象的严格相等性检查 `===` 无法被拦截。 |
+
+### vue的响应式前置知识-Reflect
+
+`Reflect` 对象是一个内建对象，它提供了一组与对象操作相关的方法，这些方法的行为与对应的内建函数基本一致，只是有些细节的差别。通过使用 `Reflect` 对象，我们可以更加方便、安全地操作对象，同时也可以避免直接使用内建函数时可能出现的一些问题。
+
+[Reflect](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Reflect) API 旨在补充 [Proxy](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Proxy)。对于任意 `Proxy` 捕捉器，都有一个带有相同参数的 `Reflect` 调用。我们应该使用它们将调用转发给目标对象。[Reflect](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Reflect) API 旨在补充 [Proxy](https://developer.mozilla.org/zh/docs/Web/JavaScript/Reference/Global_Objects/Proxy)。对于任意 `Proxy` 捕捉器，都有一个带有相同参数的 `Reflect` 调用。我们应该使用它们将调用转发给目标对象。
+
+【案例——可观察的对象】
+
+```js
+let handlers = Symbol('handlers');
+
+function makeObservable(target) {
+  // 1. 初始化 handler 存储
+  target[handlers] = [];
+
+  // 将 handler 函数存储到数组中，以便于之后调用
+  target.observe = function(handler) {
+    this[handlers].push(handler);
+  };
+
+  // 2. 创建一个 proxy 以处理更改
+  return new Proxy(target, {
+    set(target, property, value, receiver) {
+      let success = Reflect.set(...arguments); // 将操作转发给对象
+      if (success) { // 如果在设置属性时没有出现 error
+        // 调用所有 handler
+        target[handlers].forEach(handler => handler(property, value));
+      }
+      return success;
+    }
+  });
+}
+
+let user = {};
+
+user = makeObservable(user);
+
+user.observe((key, value) => {
+  alert(`SET ${key}=${value}`);
+});
+
+user.name = "John";
 ```
-webpack 的基础概念：模块打包、入口、出口等。
 
-webpack 的配置：通过 webpack.config.js 配置打包参数。
+谈谈我对这段代码的理解。通过返回一个针对user的代理，实现了对user的set行为的观察。主要的方法是，在user中添加handlers数组成员，用来存储针对set行为的所有观察方法，在user中添加observe方法，用来将观察函数存入user的观察方法数组（handlers）中。代理实现对set行为进行监听，当set行为成功之后，就会把handlers中的方法遍历执行，从而实现了对set行为的观察。
 
-webpack 加载器和插件：使用加载器对不同类型的文件进行转换和处理，使用插件增强打包的功能。
+【本节参考】
 
-webpack 编译和优化：使用 source map 和 tree shaking 等技术，提高代码的可调试性和性能。
+https://zh.javascript.info/proxy#zong-jie
 
-webpack 的实际应用场景：如多页面应用、懒加载等。
+### vue3的响应式原理
+
+#### 对于vue2响应式原理的简单理解
+
+- 针对对象：递归遍历对象的所有属性，将它们的值定义成getter和setter（`Object.defineProperty`）。当页面使用对应属性时，每个属性都拥有自己的`dep`属性，存放他所依赖的` watcher`（依赖收集），当属性变化后会通知自己对应的` watcher` 去更新(派发更新)。
+- 针对数组：vue中的响应式是针对数组对象本身，而不是数组的元素。因此在触发数组长度变化及数组变异方法后，才会响应式地更新内容。
+
+#### 和vue2的区别
+
+- 给vue3的响应式对象新增属性，同样也是响应式的。这是因为vue2需要在对象初始化时利用Object.defineProperty给对象的属性添加getter和setter，而新增的属性没有进行这个流程。而在vue3中对象直接委托给代理，代理可以知道对象的任意操作。
+- vue2实现响应式是通过Object.defineProperty实现的，vue3的响应式是通过proxy实现的。
+
+#### effect、track、trigger
+
+- effect，执行副作用函数，将副作用函数保存到全局变量`activeEffect`。如果监听属性改变，某些操作需要被执行，因而形成了副作用函数。
+- track，将正在执行的副作用函数`activeEffect`放到它对应的属性集合dep中。
+- trigger，当属性被访问时，它的dep中的方法逐一遍历执行。
+
+#### 示例——reactive-ref-computed
+
+- ref：只用来维护一个值，实际上就是向reactive传入只有一个属性的对象
+
+- computed：
+
+  设计的执行流程：在effect执行的过程中，activeEffect的值为`() => result.value = fn()`，之后result.value的proxy.handler.get被调用，`() => result.value = fn()`成为了result.value的dep中的一个，在下次访问时会trigger，于是数据同步更新
+
+代码来源：[林三心画了8张图，最通俗易懂的Vue3响应式核心原理解析 - 掘金 (juejin.cn)](https://juejin.cn/post/7001999813344493581#heading-13)
+
+```js
+const targetMap = new WeakMap()
+function track(target, key) {
+    // 如果此时activeEffect为null则不执行下面
+    // 这里判断是为了避免例如console.log(person.name)而触发track
+    if (!activeEffect) return
+    let depsMap = targetMap.get(target)
+    if (!depsMap) {
+        targetMap.set(target, depsMap = new Map())
+    }
+
+    let dep = depsMap.get(key)
+    if (!dep) {
+        depsMap.set(key, dep = new Set())
+    }
+    dep.add(activeEffect) // 把此时的activeEffect添加进去
+}
+function trigger(target, key) {
+    let depsMap = targetMap.get(target)
+    if (depsMap) {
+        const dep = depsMap.get(key)
+        if (dep) {
+            dep.forEach(effect => effect())
+        }
+    }
+}
+function reactive(target) {
+    const handler = {
+        get(target, key, receiver) {
+            track(receiver, key) // 访问时收集依赖
+            return Reflect.get(target, key, receiver)
+        },
+        set(target, key, value, receiver) {
+            Reflect.set(target, key, value, receiver)
+            trigger(receiver, key) // 设值时自动通知更新
+        }
+    }
+
+    return new Proxy(target, handler)
+}
+let activeEffect = null
+function effect(fn) {
+    activeEffect = fn
+    activeEffect()
+    activeEffect = null
+}
+function ref(initValue) {
+    return reactive({
+        value: initValue
+    })
+}
+//返回一个依赖于某个响应式的值A的值B
+/*在effect执行的过程中，activeEffect的值为`() => result.value = fn()`，之后result.value的proxy.handler.get被调用，`() => result.value = fn()`成为了result.value的dep中的一个，在下次访问时会trigger，于是数据同步更新*/
+function computed(fn) {
+    const result = ref()
+    effect(() => result.value = fn())
+    return result
+}
 ```
+
+【本节参考】[「自我检验」熬夜总结50个Vue知识点，全都会你就是神！！！ - 掘金 (juejin.cn)](https://juejin.cn/post/6984210440276410399#heading-33)
+
+### vue2的编译原理
+
+#### mount函数
+
+- 本质作用
+
+  确定vue实例对象所对应的模板的根节点位置`el`以及使用的模板`template`，根据`template`生成`render`函数并且调用它，最终将渲染的结果插入到指定的根节点位置。
+
+- 确定el和template的流程
+
+<img src=".\ref_img\mount流程.png" alt="mount流程" style="zoom: 67%;" />
+
+### parse函数
+
+- AST：抽象语法树，将节点抽象为对象，并且这些对象是包含了代码中节点之间的关系的（每个节点可以看作是一棵树）
+
+  ```js
+  //形如，元素节点的定义
+  export interface BaseElementNode extends Node {
+    type: NodeTypes.ELEMENT // 类型
+    ns: Namespace // 命名空间 默认为 HTML，即 0
+    tag: string // 标签名
+    tagType: ElementTypes // 元素类型
+    isSelfClosing: boolean // 是否是自闭合标签 例如 <br/> <hr/>
+    props: Array<AttributeNode | DirectiveNode> // props 属性，包含 HTML 属性和指令
+    children: TemplateChildNode[] // 字节点
+  }
+  ```
+
+- parse本质作用：将template转为AST
+- 实现思路：
+  - 使用正则表达式匹配出开始标签、文本节点、结束标签的位置
+  - 使用指针root和curParent记录根节点和当前节点，使用栈存放临时节点，目的是为了记录节点之间的父子关系，并且最终返回root对象，也就是template对应的AST
+
+### generate函数
+
+- parse本质作用：根据AST生成code字符串
+
+- 生成虚拟节点：`_v` 函数用于生成文本节点；`_c` 函数用于生成组件节点或普通元素节点
+
+- 实现思路：
+
+  - AST进行递归，将其孩子节点的信息传给相应的辅助函数，拼接出code字符串
+
+    - 后续：
+
+      使用`new Function	`将code字符串编译解析，获得可以被调用的render函数
+
+      render函数需要根据vue实例中的信息动态地渲染模板，所以需要能够访问到vue实例中的内容。使用`with`函数将vue实例放到作用域链的最开始，这样就可以通过this访问到vue实例中的内容
+
+### vue2的diff算法
+
+diff算法的本质作用：在更新dom树的过程中，通过使用diff算法，来最小化对真实dom的操作，从而节约开销
+
+diff算法的本质：在同一层上进行新旧子元素的对比，根据新子元素数组调整旧子元素的子结构，而涉及到子元素的差异，使用patchNode进行递归处理
+
+diff算法的设计与实现理解：
+
+| <img src=".\ref_img\diff算法-1.jpg" alt="diff算法-1" style="zoom: 67%;" /> | <img src=".\ref_img\diff算法-2.jpg" alt="diff算法-2" style="zoom: 67%;" /> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+
+
+
+## vite
+
+
 
 ## nodejs
 
@@ -352,7 +908,7 @@ webpack 的实际应用场景：如多页面应用、懒加载等。
 
    - 使用export，import导出导入，配置`package-json`中`"type": "module"`
 
-   5.3 区别（待补充）
+   5.3 区别（待完善）
 
    CommonJs在运行时加载模块，ESmodule在编译时加载模块
 
@@ -384,25 +940,381 @@ webpack 的实际应用场景：如多页面应用、懒加载等。
 
 ## 计网基础
 
-###    跨源请求
+### web存储
+
+#### cookie
+
+1. 简述：第一次请求一个页面时，服务器可以在HTTP响应头中设置cookie信息，告诉浏览器在下次请求时需要携带这些cookie信息。当浏览器接收到这样的HTTP响应时，会自动将cookie保存在本地，并在下次请求时自动将cookie信息包含在请求头中一起发送给服务器，以便服务器能够获取并使用cookie信息。
+
+   请求端发送cookie
+
+   ```
+   Cookie: name=xxx
+   ```
+
+   响应端设定cookie中每条的属性
+
+   ```
+   Set-Cookie: name=value; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Path=/
+   ```
+
+2. 加密和设置有效期：cookie是存储在浏览器中的，可以被用户或第三方工具进行访问或修改。因此，对于包含敏感信息的cookie，服务器需要采取一些措施来保护其安全性，例如使用加密算法对cookie进行加密，限制cookie的有效期等。
+
+3. cookie的常用属性
+
+   - 生命周期：Expires到期时间，Max-Age时间间隔，浏览器收到报文计算
+   - 作用域：cookie会绑定域名+路径，如果将path设置为/，那么域名下的任意路径都可以使用path
+   - 安全相关：-
+
+#### localStorage&sessionStorage
+
+1. 简述：前端应用程序生成或维护的数据，长期保存在本地存储。同时不像cookie会在http请求中发送。是HTML5新增的一种本地存储机制。有相关的api对其进行设置获取移除等。与 `localStorage` 不同的是，`sessionStorage` 中存储的数据在会话结束时会被自动清除，而不是永久存储在浏览器中。
+
+（待学习考证）
+
+| 特性         | cookie                           | localStorage                               |
+| ------------ | -------------------------------- | ------------------------------------------ |
+| 存储容量     | 最多 4KB                         | 最多 5MB                                   |
+| 有效期限     | 可设置失效时间                   | 可永久保存，除非主动删除或清除缓存         |
+| 存储位置     | 存储在客户端和服务器端           | 只存储在客户端                             |
+| 作用范围     | 作用于所有同源的页面             | 作用于所有同源的页面                       |
+| 跨域支持     | 支持跨域设置                     | 不支持跨域设置                             |
+| 自动发送     | 自动随着 HTTP 请求发送           | 不会随着 HTTP 请求发送，需要手动读取和写入 |
+| 数据类型     | 只支持字符串类型                 | 支持字符串、数字、布尔、对象等数据类型     |
+| 安全性       | 存在跨站脚本攻击风险             | 不存在跨站脚本攻击风险                     |
+| 存储位置限制 | 存储位置受限于域名和路径         | 没有存储位置限制                           |
+| 清除方法     | 可以通过设置过期时间或者手动清除 | 可以手动清除                               |
+
+### HTTP基础知识
+
+#### http含义
+
+超文本传输协议（Hypertext Transfer Protocol），是一种用于传输超媒体文档（例如 HTML）的应用层协议。HTTP 是一个客户端-服务器协议，其中客户端向服务器发送请求，服务器回复客户端的响应。
+
+#### 报文结构
+
+注释：1. 这里的version指的是http的版本 2. 空行用来分隔头部和实体的
+
+| <img src=".\ref_img\req.png" alt="lifecycle" style="zoom: 67%;" /> | <img src=".\ref_img\res.png" alt="lifecycle" style="zoom: 67%;" /> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+
+#### 请求方法
+
+1. 常用的各种方法：
+
+GET: 通常用来获取资源
+
+HEAD: 获取资源的元信息（资源的大小、类型、是否存在等信息）
+
+POST: 提交数据，即上传数据（创建一个新的数据）
+
+PUT: 修改数据（更新或替换服务器上的资源）
+
+DELETE: 删除资源(几乎用不到)
+
+OPTIONS: 列出可对资源实行的请求方法，用来跨域请求
+
+==CONNECT==: 建立连接隧道，用于代理服务器
+
+==TRACE==: 追踪请求-响应的传输路径
+
+2. GET和POST的区别
+
+   |          | GET                                           | POST                               |
+   | -------- | --------------------------------------------- | ---------------------------------- |
+   | 语义     | 获取资源                                      | 提交创建新的资源                   |
+   | 缓存     | 浏览器的缓存目录会保存GET的响应，以便下次使用 | POST默认不会                       |
+   | 参数编码 | 只接受URL编码                                 | 多种编码方式                       |
+   | 参数位置 | 只在URL中传递                                 | 在请求体中传递，更加安全           |
+   | 幂等性   | 同一个GET请求幂等（结果一致）                 | 同一个POST请求不幂等（结果不一致） |
+
+#### URL
+
+1. 作用：(Uniform Resource Locator，统一资源定位符)用于区分互联网上的不同资源
+
+2. 结构
+
+   <img src=".\ref_img\URL.png" alt="lifecycle" style="zoom: 67%;" />
+
+   - 协议
+   - 主机+端口
+   - 路径
+   - 查询参数
+   - 锚点
+
+#### 状态码
+
+- **1xx**: 表示目前是协议处理的中间状态，还需要后续操作。
+
+- **2xx**: 表示成功状态。（200）
+
+  204 表示成功处理了请求但是没有返回任何内容
+
+- **3xx**: 重定向状态，资源位置发生变动，需要重新请求。（301 302 304）
+
+  301是永久重定向，意味着请求的资源已经被永久移动到了一个新的位置，并且所有后续请求都应该使用新的 URL。301 响应的资源被浏览器缓存，因此在再次请求相同资源时，浏览器会自动使用重定向后的 URL。
+
+  302 是临时重定向，表示请求的资源暂时在不同的位置，所有后续请求都应该使用新的 URL，但未来可能会改变回原始位置。302 响应的资源不会被浏览器缓存，因此在再次请求相同资源时，浏览器会再次发送原始请求并获取响应。
+
+  304 使用浏览器缓存的资源版本
+
+- **4xx**: 请求报文有误。（400 403 404）
+
+- **5xx**: 服务器端发生错误。（500 502 503）
+
+#### http的特点
+
+1. 优点：
+
+   - HTTP 协议采用文本形式进行通信，数据传输格式易于理解，协议本身也非常简单，容易实现和调试。
+   - 支持多种媒体类型。（文本、图片、音频、视频）
+   - 应用广泛、跨平台
+
+2. 缺点：
+
+   - 明文传输导致的安全性低问题。
+   - HTTP 协议传输的数据包含较多的头部信息导致传输效率较低问题。
+
+3. http的无状态
+
+   每个请求都是独立的，服务器不会保存任何客户端请求的信息，也就是说服务器无法确定该请求是否来自同一客户端，也无法判断该请求之前是否有过相同的请求。
+
+   这样做保证了各请求之间的独立性，可扩展性，减轻服务器的负担，但也无法维持客户端的状态，所以引入了cookie、session等
+
+### http的版本对比
+
+<img src=".\ref_img\http版本.jpg" alt="http版本"  />
+
+
+#### Accept 系列字段
+
+为了指定发送方（希望接收的数据）和接收方（发送给发送方的数据）body部分的数据的数据类型、字符集、压缩方式、支持语言，设定了一系列字段，下面是两个例子
+
+```http
+GET /example HTTP/1.1
+Host: example.com
+Accept: text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8
+Accept-Language: en-US,zh-CN
+Accept-Encoding: gzip, deflate
+Accept-Charset: charset=utf-8
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Language: en-US
+Content-Encoding: gzip
+
+（HTML content）
+```
+
+#### 定长和不定长的数据的传输
+
+1. 对于确定长度的数据，需要在响应报文头部指定内容的长度，`Content-Length`
+2. 对于不定长读的数据，使用分块编码传输数据，需要在响应报文头部`Transfer-Encoding:chunked`设定，这样一来`Content-Length`会被忽略，同时会基于长连接持续推送动态内容。且每个分块的长度不超过8字节。
+
+#### 范围请求处理大文件传输
+
+范围请求（Range Request）是指客户端请求服务器返回文件的部分内容，而不是完整的文件。这个功能可以用于多线程下载、断点续传等场景，避免了重复下载整个文件。
+
+#### http处理表单提交的数据
+
+一般是通过POST方法提交表单数据，有两种常用的配置设置：
+
+1. `Content-Type:application/x-www-form-urlencoded`
+
+   转化为键值对用&连接，使用URL编码
+
+   ```
+   {a: 1, b: 2} -> a=1&b=2 ->"a%3D1%26b%3D2"
+   ```
+
+2. `Content-Type:multipart/form-data`
+
+   每一个表单元素都是独立的资源表述。
+
+#### 队头阻塞问题http1.1的解决
+
+队头阻塞：指的是当一个请求被阻塞时，它之后的所有请求也会被阻塞。
+
+http/1.1的策略
+
+- 域名分片
+
+  域名分片指的是将一个网站的内容放置在不同的域名下，例如将静态资源放在cdn.example.com，将网站接口放在api.example.com，将主站放在www.example.com，这样可以利用浏览器的并发请求限制，同时提高网站的加载速度。
+
+  在同一台服务器的情况下，浏览器对于同一个域名的并发请求数量是有限制的，但是不同的域名是独立的，因此可以建立更多的连接，提高并发请求的数量。
+
+  需要注意的是，由于域名分片会增加DNS解析的开销，并且在不同的域名之间进行请求也会带来一定的网络延迟，因此需要权衡利弊，根据具体的情况选择是否使用域名分片。
+
+- 并发连接：使用多个连接并发传输请求和响应，可以提高吞吐量，需要避免过度带来的开销增大
+
+- 持久连接，复用连接来减少连接建立和关闭的开销
+
+
+#### http代理
+
+1. 含义：扮演中间人的角色，对于客户端，表现为服务器接收请求，对于服务器，表现为客户端发送请求。它可以拦截客户端和服务器之间的通信，对数据进行处理和过滤，从而实现各种功能，如负载均衡、安全防护、数据缓存等。
+
+2. 优点：
+
+   - 缓存：代理服务器可以缓存一些页面，这样请求不需要到达源服务器
+
+   - 负载均衡算法：代理服务器可以通过一些负载均衡算法（轮询，随机，加权轮询等），将请求分给不同的源服务器，避免单个服务器负载过高
+
+   - 安全保障：
+
+     心跳机制是用于监控后台服务器的一种方式。代理服务器会定期向后台服务器发送心跳包，检测服务器是否正常运行。如果发现某台服务器无法响应心跳包，说明这台服务器出现了故障，代理服务器会将其从服务器集群中剔除，避免继续向故障服务器发送请求。
+
+     代理服务器还可以对数据进行过滤和限流，以保护服务器的安全。对于非法 IP，代理服务器可以通过 IP 黑名单或白名单等方式进行限制，禁止或允许这些 IP 的访问。对于恶意请求，代理服务器可以使用各种防护措施，如验证码、限制请求频率等手段，防止服务器被攻击和滥用。
+
+3. 可以通过使用代理协议来解决在请求头中经过不同的代理服务器需要不断修改请求方IP（`X-Forwarded-For`属性）的问题
+
+#### http缓存
+
+1. 强缓存
+
+   强缓存（也称为本地缓存）是指在客户端（例如浏览器）本地缓存中存储的响应数据，客户端可以直接使用该缓存数据而无需向服务器发起请求。强缓存的优势在于可以有效地减少对服务器的请求，从而提高页面加载速度和用户体验。
+
+   强缓存的实现依靠 HTTP 响应头中的 Expires 和 Cache-Control 属性。Expires 是一个表示缓存过期时间的日期时间值，而 Cache-Control 是一个表示缓存策略的指令集合。当客户端请求一个资源时，如果该资源的缓存仍然有效，则服务器返回 304 Not Modified 状态码和空的响应体，客户端直接从本地缓存中获取数据。
+
+2. 协商缓存
+
+   协商缓存是一种缓存策略，通过在请求头和响应头中添加特定的信息来判断资源是否需要从服务器获取，以减少不必要的数据传输和服务器负载。
+
+   协商缓存的实现需要用到两个 HTTP 头：`If-Modified-Since` 和 `Last-Modified`，以及 `If-None-Match` 和 `ETag`。
+
+   1. Last-Modified 和 If-Modified-Since
+
+   当客户端发送请求时，如果请求头中包含 `If-Modified-Since`，那么就说明客户端已经有了该资源的一个副本，并且副本的最后修改时间为请求头中的 `If-Modified-Since` 字段的值。服务器会比较该时间戳和该资源的最后修改时间 `Last-Modified` 是否一致，如果一致，则服务器会返回 HTTP 304 响应，告诉客户端可以使用缓存的资源，否则会返回新的资源。
+
+   2. ETag 和 If-None-Match
+
+   与 Last-Modified 和 If-Modified-Since 类似，ETag 和 If-None-Match 也是配对出现的。ETag 是服务器为每个资源生成的唯一标识符，客户端在下一次请求时可以在请求头中添加 `If-None-Match` 字段，值为上一次请求返回的 `ETag` 值。服务器会比较该值和当前资源的 `ETag` 是否一致，如果一致，则返回 HTTP 304 响应，告诉客户端可以使用缓存的资源，否则返回新的资源。
+
+   协商缓存的优点是可以让客户端和服务器之间传输的数据量更小，减少网络流量和服务器的负载。此外，它也能更精确地判断是否需要使用缓存，因为它会比较资源的修改时间或唯一标识符，而不是仅仅比较缓存是否过期。
+
+3. 代理缓存
+
+   代理缓存是指在代理服务器上缓存请求的响应，以减轻源服务器的负载并提高访问速度。
+
+   **服务器的缓存控制**，在`Cache-Control`响应头字段设置：
+
+   `public`表示响应可以被缓存在代理服务器上，也可以共享给其他客户端
+
+   `private`表示响应只能在客户端保存，而不能保存在代理服务器上
+
+   `must-revalidate`的意思是客户端缓存过期就去源服务器获取，而`proxy-revalidate`则表示代理服务器的缓存过期后到源服务器获取。它们都是在响应中设置的指令，好让请求方在缓存过期后获得新的缓存。
+
+   `s-maxage`用于设定响应在代理服务器上的缓存时间
+
+   **客户端的缓存控制**，在`Cache-Control`请求头字段设置：
+
+   `max-stale=5`表示客户端到代理服务器上拿缓存的时候，即使代理缓存过期了也不要紧，只要过期时间在**5秒之内**，还是可以从代理中获取的。
+
+   `min-fresh=5`表示代理缓存需要一定的新鲜度，不要等到缓存刚好到期再拿，一定要在**到期前 5 秒**之前的时间拿，否则拿不到。
+
+   以上两个属性只在协商缓存中有效，需要携带协商缓存相关的请求头（例如 `If-Modified-Since`、`If-None-Match` 等）
+
+   `only-if-cached`这个字段加上后表示客户端只会接受代理缓存，而不会接受源服务器的响应。如果代理缓存无效，则直接返回`504（Gateway Timeout）`。
+   
+#### https
+
+1. 概念导图
+
+<img src=".\ref_img\https.jpg" alt="https" style="zoom: 67%;" />
+
+2. 验证数字证书流程
+
+   <img src=".\ref_img\证书的校验.png" alt="证书的校验" style="zoom: 67%;" />
+
+3. 基于RSA算法的TLS握手流程图
+
+   <img src=".\ref_img\基于RSA算法的TLS握手.png" alt="基于RSA算法的TLS握手流程图" style="zoom: 67%;" />
+
+###    跨域
 
    1. 基础概念
 
-      - 源（origin）：域（domain）/端口（port）/协议（protocol）的组合。
+      - 同源：如果两个url具有相同的协议、主机名、端口号，则它们被认为是同源的。同源策略是浏览器实现的一种安全机制，目的是为了保护用户的隐私安全。
+
       - 域名（Domain Name）：是一个字符串，代表一个网络上的计算机的地址。它是对于网络中使用数字地址（如IP地址）的一个抽象层次。域名是用来替代数字地址，以方便用户记忆和识别。
-      - IP地址：计算机在 Internet 中的唯一标识。
+
+        www.example.com：com 是顶级域名（TLD，Top-Level Domain），表示商业性质的域名；example 是二级域名，是一个示例域名，用于说明域名的使用方法；而 www 是主机名，表示一个 Web 服务器上的某个网站。
+
+      - IP地址：计算机在 Internet 中的唯一标识，由网络号+主机号组成。
+
+      - 端口号：用于标识一个应用程序或服务的数字，通过端口号，可以将不同的应用程序或服务区分开来，确保它们能够同时在同一台计算机上运行。
+
+        当使用http协议时，服务器会在80端口监听http请求，而如果在服务器上设定了其他端口号监听，那么在发送的url中就需要写明这个端口号。
+
       - DNS：DNS (Domain Name System) 是一个基于分布式数据库的系统，它把 Internet 上每个主机名和 IP 地址进行了映射，使得人们可以通过主机名访问网站，而不需要记住每个网站的 IP 地址。
+
+      - AJAX：Ajax（Asynchronous JavaScript and XML）是一种用于创建异步Web应用程序的技术。它使用JavaScript和XML来实现异步的、动态的Web应用程序，可以在不刷新整个页面的情况下更新页面的部分内容。
+
+        Ajax技术的核心是XMLHttpRequest对象，它可以通过JavaScript代码向服务器发送HTTP请求，获取服务器返回的数据，然后通过JavaScript来更新页面的内容。
+
+      - 跨域请求：当浏览器向目标url发送请求，当前的url和目标url不同源，就称为跨域请求
+
       - 安全跨源请求流程：浏览器发送请求，请求中包含origin->服务器确定origin是被允许的源，服务器发送包含`Access-Control-Allow-Origin`响应->浏览器拿到服务器发送的结果
 
-   2. 开发环境下的跨源请求
+   2. cors
 
-      可以把vue和flask项目看作服务器，他们的主机ip+端口号可以确定一个网络服务器的地址，但是它不是一个独特的域名。这两个项目之间的通信也需要设置跨源请求，但是不需要指定源。
+      1. 安全（简单请求）请求，满足下面两个条件之一：
 
-        知识点3：`FormData`对象
+         - 请求方法：GET/POST/HEAD
 
-         - 这是一个表单数据对象，可以用来捕获html表单，同时很多方便的方法自己添加字段，如`formData.append(key,val)`，之后使用一些网络方法提交这些表单数据。
-         - 本功能中使用它来像后台发送文件，发送包含文件的请求需要在请求头中设置`'Content-Type': 'multipart/form-data'`
-         - flask中`request.files`是一个字典，保存了请求中所有文件名和文件内容形成的键值对，可以用来保存文件到后台
+         - 请求头头字段的取值范围：Accept、Accept-Language、Content-Language、Content-Type（但仅限于特定值：application/x-www-form-urlencoded、multipart/form-data、text/plain）
+
+      2. 安全请求的跨域流程
+
+         浏览器向请求中添加origin字段，说明请求是来自的源，服务器确定origin是被允许的源后，将在响应中添加`Access-Control-Allow-Origin`字段（这个字段中包含被允许的url），浏览器可以获取响应结果
+
+      3. 非安全请求
+
+         非安全请求需要增加预检的过程，具体情况如下：
+
+         1. 发送预检请求，使用OPTIONS方法发送预检请求
+
+            ```http
+            OPTIONS / HTTP/1.1
+            Origin: 当前地址
+            Host: 目标地址
+            Access-Control-Request-Method: 发送请求的方法
+            Access-Control-Request-Headers: 发送请求头中的字段
+            ```
+
+         2. 发送预检的响应
+
+            ```http
+            HTTP/1.1 200 OK
+            Access-Control-Allow-Origin: *|允许的源
+            Access-Control-Allow-Methods: GET, POST, PUT|允许的方法
+            Access-Control-Allow-Headers: X-Custom-Header|允许的请求头字段
+            Access-Control-Allow-Credentials: true|允许发送cookie
+            Access-Control-Max-Age: 1728000|预检请求的有效时间
+            Content-Type: text/html; charset=utf-8
+            Content-Encoding: gzip
+            Content-Length: 0
+            ```
+
+         3. 之后走安全请求的流程
+
+   3. JSONP
+
+      JSONP利用了script标签不受跨域限制的特性，在服务端响应一个特定格式的JavaScript函数调用，前端通过动态插入script标签并指定src地址，来获取服务端数据。服务端响应的数据会被包裹在回调函数中，并作为参数传递给前端函数执行。因为script标签只能发送GET请求，所以JSONP也只能用于GET请求。
+
+      具体的代码参考笔记来源部分大佬的博客
+
+   4. Nginx
+
+      1. 正向代理和反向代理
+
+         - 正向代理帮助客户端访问客户端访问不到的服务器，并将结果返回给客户端
+
+         - 反向代理拿到客户端请求，并且将请求发送给其他的服务器，主要应用场景是维持服务器集群的负载均衡
+
+      2. Nginx作为高性能的反向代理服务器，在Nginx的配置中添加相关的跨域信息。从而客户端发送请求到代理服务器，代理服务器发送请求到源服务器，从而解决跨域问题。
 
 ### `FormData`对象
 
@@ -410,39 +1322,11 @@ webpack 的实际应用场景：如多页面应用、懒加载等。
    - 本功能中使用它来像后台发送文件，发送包含文件的请求需要在请求头中设置`'Content-Type': 'multipart/form-data'`
    - flask中`request.files`是一个字典，保存了请求中所有文件名和文件内容形成的键值对，可以用来保存文件到后台
 
-## 移动端
+### http所有笔记来源
 
-```
-响应式布局：通过使用CSS media queries和流式布局等技术，使网站能够在多种尺寸的设备上得到最佳呈现。
+[（建议精读）HTTP灵魂之问，巩固你的 HTTP 知识体系 - 掘金 (juejin.cn)](https://juejin.cn/post/6844904100035821575)
 
-触摸事件：移动端常用的触摸事件，例如单击、双击、滑动、拖放等。
-
-移动端API：包括Geolocation API，Accelerometer API，Camera API等，提供了与移动设备硬件和操作系统交互的方法。
-
-移动端离线存储：通过使用HTML5的离线存储和缓存API，使移动应用程序在没有网络连接的情况下仍然可以运行。
-
-动画：使用CSS3或JavaScript实现的动画效果，提高交互体验。
-
-移动端网络优化：通过使用压缩图像、使用CDN等方法，提高移动端网络加载速度。
-
-混合开发：使用React Native，Ionic等技术，在移动端开发混合应用程序。
-```
-
-
-
-### 响应式布局
-
-- 媒介查询：根据一些设备特征（屏幕尺寸，屏幕方向，分辨率）来选择某些css规则在该情况下生效，以此来保证在不同设备上页面的美观性正确性。一般配合max-width这样的属性来限定元素的范围。
-- element-plus中的栅格布局本身就是响应式的，在设计的时候应当充分考虑这一点
-- 字体的响应式布局，可以通过设定相对单位rem，之后通过媒体查询改变根元素的大小
-
-### 常用事件
-
-移动端常用的触摸事件，例如单击、双击、滑动、拖放等。
-
-### 微信小程序
-
-微信小程序是腾讯公司推出的一种基于微信平台的应用开发技术。它允许开发者在微信内快速开发自己的应用程序，而不需要下载和安装，可以直接使用。微信小程序是一种全新的开发方式，它可以实现基于微信内的移动应用开发，同时保证了应用的体验和功能。微信小程序支持使用JavaScript、HTML和CSS进行开发，具有高效快速、体验好、简单易用等特点。
+[3.1 HTTP 常见面试题 | 小林coding (xiaolincoding.com)](https://xiaolincoding.com/network/2_http/http_interview.html#http-基本概念)
 
 ## 补充
 

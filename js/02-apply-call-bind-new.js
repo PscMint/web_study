@@ -19,11 +19,11 @@ Function.prototype.myCall=function(context){
 Function.prototype.myApply=function(context){
     const mycontext=context||Window;
     let args=arguments[1];
+    if(!Array.isArray(args))
+        throw new Error("myApply的参数需要放在数组中传入")
     const func=Symbol();
     mycontext.func=this;
     let res;
-    if(!Array.isArray(args))
-        throw new Error("myApply的参数需要放在数组中传入")
     if(args){
         res=mycontext.func(...args);
     }else{
@@ -33,6 +33,17 @@ Function.prototype.myApply=function(context){
     return res;
 }
 //使用myNew函数模拟new运算符的功能
+function myNew(context){
+    if(typeof context !== 'function')
+    throw new Error("非构造函数")
+    let obj = new Object();
+    obj.__proto__=context.prototype;
+    let res = context.apply(obj,[...arguments].slice(1));
+    if (res){
+        return res;
+    }
+    return obj;
+}
 //myBind实现
 //存在的问题：如果返回的函数作为构造函数，不会返回一个新的对象
 Function.prototype.myBind=function(context) {

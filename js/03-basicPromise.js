@@ -109,6 +109,9 @@ class MyPromise {
     
     return promise2;
   }
+    catch(onRejectedCB){
+        this.then(null,onRejectedCB);
+    }
 
   // resolve 静态方法
   static resolve (parameter) {
@@ -129,25 +132,59 @@ class MyPromise {
       reject(reason);
     });
   }
+  //all
+  static all(promises){
+    const N=promises.length
+    const res=[];
+    let count=0;
+    return new MyPromise((resolve,reject)=>{
+        promises.forEach((promise,i)=>{
+            MyPromise.resolve(promise).
+            then((value)=>{
+                res[i]=value;
+                count++;
+                if(count===N)
+                    resolve(res)
+            }).catch(reject)
+            
+        })
+    })
+  }
+    //race
+ static race(promises){
+     return new MyPromise((resolve,reject)=>{
+         promises.forEach((promise)=>{
+             MyPromise.resolve(promise).
+                 then(resolve,reject)
+         })
+     })
+ }
 }
 
-function resolvePromise(promise2, x, resolve, reject) {
-  // 如果相等了，说明return的是自己，抛出类型错误并返回
-  if (promise2 === x) {
-    return reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
-  }
-  // 判断x是不是 MyPromise 实例对象
-  if(x instanceof MyPromise) {
-    // 执行 x，调用 then 方法，目的是将其状态变为 fulfilled 或者 rejected
-    // x.then(value => resolve(value), reason => reject(reason))
-    // 简化之后
-    x.then(resolve, reject)
-  } else{
-    // 普通值
-    resolve(x)
+
+function resolvePromise(promise2,x,resolve,reject){
+  if(promise2===x)
+      throw new TypeError("Chaining cycle detected for promise #<Promise>")
+  if(typeof x==='object'||typeof x ==='function'){
+      if(x===null)
+          resolve(x);
+      let then;
+      try{
+         then=x.then 
+      }
+      catch(err){
+          reject(err)
+      }
+      if(typeof then==='function'){
+          x.then(resolve,reject)
+      }
+      else{
+          resolve(x)
+      }
+  }else{
+      resolve(x)
   }
 }
-
 MyPromise.resolve().then(() => {
   console.log(0);
   return MyPromise.resolve(4);
@@ -167,26 +204,3 @@ MyPromise.resolve().then(() => {
   console.log(6);
 })
 
-function resolvePromise(promise2,x,resolve,reject){
-    if(promise2===x)
-        throw new TypeError("Chaining cycle detected for promise #<Promise>")
-    if(typeof x==='object'||typeof x ==='function'){
-        if(x===null)
-            resolve(x);
-        let then;
-        try{
-           then=x.then 
-        }
-        catch(err){
-            reject(err)
-        }
-        if(typeof then==='function'){
-            x.then(resolve,reject)
-        }
-        else{
-            resolve(x)
-        }
-    }else{
-        resolve(x)
-    }
-}

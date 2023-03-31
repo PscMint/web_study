@@ -35,12 +35,12 @@
         /* 换行 */
         .wrap{
             flex-wrap: wrap;
-            /* nowra(default)|wrap|wrap-reverse */
+            /* nowrap(default)|wrap|wrap-reverse */
         }
         /* 对齐 */
         /* */
         .justify{
-            justify-content: space-between;
+            justify-content: center;
             /* flex-start(default) | flex-end | center | space-between | space-around; */
         }
         .align{
@@ -48,7 +48,7 @@
             /* flex-start | flex-end | center | baseline | stretch(default); */
         }
         .align-content{
-            align-content: center;
+            align-content:space-between;
             /* flex-start | flex-end | center | space-between | space-around | stretch(default) */
         }
         /* 子元素属性 */
@@ -76,6 +76,12 @@
         .align-self{
             align-self: center;
         }
+		.w30{
+			width: 100px;
+            height: 60px;
+            background-color: lightblue;
+			
+		}
       
 
         
@@ -124,9 +130,9 @@
 </div>
 <h3>order</h3>
 <div class="flex-container">
-    <div class="box-wh m-5 order-3">1(w=3)</div>
-    <div class="box-wh m-5 order-1" >2(w=1)</div>
-    <div class="box-wh m-5 order-2">3(w=2)</div>
+    <div class="box-wh m-5 order-3">dom1(w=3)</div>
+    <div class="box-wh m-5 order-1" >dom2(w=1)</div>
+    <div class="box-wh m-5 order-2">dom3(w=2)</div>
 </div>
 <h3>flex-grow：按比例分配剩余的空间。</h3>
 <div class="flex-container">
@@ -168,6 +174,15 @@
     <div class="box-wh m-5 align-self">box-b</div>
     <div class="box-wh m-5">box-c</div>
    
+</div>
+<div class="flex-container wrap">
+	<div class="w30  ">1</div>
+	<div class="w30 ">2</div>
+	<div class="w30 ">3</div>
+	<div class="w30 ">3</div>
+	<div class="w30 ">3</div>
+	<div class="w30 ">3</div>
+	<div class="w30 ">3</div>
 </div>
 </body>
 </html>

@@ -50,8 +50,6 @@ ES6中所有的集合对象（数组，map，set）和字符串都是可迭代�
 | map   | value组成的迭代器 | key组成的迭代器   | [key，value]组成的迭代器  |
 | set   | value组成的迭代器 | value组成的迭代器 | [value,value]组成的迭代器 |
 
-
-
 #### 创建可迭代对象
 
 如果需要一个对象是可迭代对象，通俗可以理解为能够通过`for...of`循环遍历该对象，那么该对象需要实现名为`Symbol.iterator`的特殊方法，也可以给`Symbol.iterator`添加一个生成器
