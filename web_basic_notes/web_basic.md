@@ -58,7 +58,11 @@
 
 ### BFC
 
+更正：关于margin塌陷，使用bfc包裹垂直相邻的两个元素之一，可以避免margin塌陷
+
 <img src=".\ref_img\bfc.jpg" alt="lifecycle" style="zoom: 67%;" />
+
+【注意】clearfix是加载浮动元素的父元素上面，浮动元素本身脱离文档流，不好计算清除浮动的位置
 
 <img src=".\ref_img\clear.jpg" alt="clear" style="zoom: 67%;" />
 
@@ -75,6 +79,14 @@
 5. 使用缓存，可以使用浏览器缓存来减少页面加载时间，例如设置Expires和Cache-Control响应头。
 6. 使用CSS动画代替JavaScript动画，可以提高性能，因为CSS动画是通过GPU加速来实现的。
 7. 使用字体图标代替图片，可以减少网络请求和文件大小。
+
+面试的时候可以说
+
+1. css精灵图
+2. css动画替代js动画
+3. 批量操作dom、减少触发同步布局事件来减少页面重排次数
+4. 避免使用@import
+5. 尽量减少选择器的层级和数量
 
 ### 选择器
 
@@ -114,6 +126,8 @@
 
 - `em` 是相对于父元素的字体大小计算的。例如，如果父元素的字体大小为 `16px`，那么 `1em` 等于 `16px`。
 - `rem` 是相对于根元素（即 `<html>` 元素）的字体大小计算的。例如，如果根元素的字体大小为 `16px`，那么 `1rem` 等于 `16px`。
+- 使用`em`作为宽度单位时，它是相对于当前元素的字体大小来计算的，而不是相对于父元素的字体大小。
+- 使用`rem`作为宽度单位时，它是相对于根元素的字体大小来计算的，而不是相对于当前元素的字体大小。根元素是指文档的根元素`<html>`。
 
 #### vw vh
 
@@ -300,46 +314,767 @@ p{
 - 三栏布局
 - 实现居中的方案
 
-## js-原理
+---
 
-### 原型链
+## JS基础知识点（含手写知识点介绍）
 
-原型链的本质：
+### 01-deepClone
 
-原型链是js中的一种设计，目的是为了实现js对象的封装、继承、多态的特性。
+对深拷贝的理解：需要理解深拷贝的含义。当我们对一个对象进行复制时，不仅仅是复制它的地址，而是要复制所有它所引用的对象，为这些对象创建新的对象。
 
-对于原型链设计的理解：
+1. 基本思路：分类讨论+递归
+
+- 设计思路：如果是基本类型直接返回值，是对象则需要为每一个属性开辟新的空间
+- 实现方式：而对于每一个属性都需要判断类型（对象{},数组[],js基本数据类型），所以使用递归
+
+2. 循环引用问题
+
+- 设计思路：自己引用自己的对象会使得递归变为死循环，而实际上引用自己只需要开辟一份存储空间并且保存该空间地址，因此对于每个对象复制前都判断它是否之前复制过，如果被复制过直接指向之前的这个空间即可。
+- 实现方式：使用weakmap实现对已复制对象地址的保存。weakmap的好处是当一个对象的属性被移除后，如果这个属性的值没有被其他变量或对象引用，那么这个值所对应的对象就会成为垃圾对象，等待垃圾回收器的回收。当这个对象被回收后，它所对应的键值对也会被 `WeakMap` 自动删除。
+
+```js
+function deepClone(target,map=new weakMap()){
+    if(typeof target=="object"){
+        let object=Array.isArray(target)?[]:{};
+        if(map.get(target)){
+            return map.get(target);
+        }
+        map.set(target,object);
+        for(let key in target){
+            object[key]=deepClone(target[key],map);
+        }
+        return object;
+    }
+    else{
+        return target;
+    }
+}
+```
+
+
+
+### 02-call、apply、bind、new
+
+【call、apply、bind】
+
+- 对call、apply、bind的理解：三者实际上是Function的成员函数，让函数在调用时指定this指向的对象。实现了让不同的对象（context）可以将某个非成员函数作为自己的方法函数使用。
+
+- 三者实现上的区别
+
+|          | call                                                  | apply                                                 | bind                                      |
+| -------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------- |
+| 接收参数 | func.call(context,参数1,...,参数n)                    | func.apply(context,[参数数组])                        | func.bind(context,参数1,...,参数n)        |
+| 返回情况 | 让this指向context，直接调用func，并给返回func的返回值 | 让this指向context，直接调用func，并给返回func的返回值 | 返回func函数的包装，同时让this指向context |
+
+- call、apply实现思路概述
+
+  1. 参数校验：这个环节的目的是为了保证传入的参数是我们期待的格式，这样能够保证参数得到正确的处理。具体来说校验工作包括：
+
+     - 是否传递了该参数，如果没有参数是否设置默认值
+     - 参数是否有类型的要求，如果有则要进行判断，符合要求才能继续执行
+
+     需要注意的是，参数不一定只出现在一开始，也可能是在中间产生，传递给其他函数。不论参数出现在哪里都需要注意适时的校验。
+
+  2. 绑定和解绑：根据实现目的，要让func成为context的成员函数，因此有绑定和解绑的过程。当然在绑定了之后需要对函数进行一个调用，之后再解绑还原。
+
+     - 这里有一个细节在于func函数名可能会和context本身的成员函数同名，因此我们使用一个symbol对象给func进行重命名。
+
+- bind实现思路概述
+
+  实际上bind就是使用一个函数包装apply函数，并将这个函数作为返回值，由使用者决定这个函数调用的时机。
+
+  - bind接受的参数和返回函数接受的参数都最终作为func的参数来执行
+
+```js
+Function.prototype.myCall=function(context){
+    //绑定在函数的原型上，myCall应该只能被函数对象使用，无需判断
+    // if(typeof this!=="function")
+    //     throw new Error("can only be called by a function")
+    const mycontext=context||Window;
+    let args=[...arguments].slice(1);
+    const func=Symbol();
+    mycontext.func=this;
+    let res;
+    if(arguments[1])
+    res=mycontext.func(...args);
+    else
+    res=mycontext.func();
+    delete mycontext.func;
+    return res;
+
+}
+//myApply和myCall的区别只在于参数调用上的不同
+Function.prototype.myApply=function(context){
+    const mycontext=context||Window;
+    let args=arguments[1];
+    if(!Array.isArray(args))
+        throw new Error("myApply的参数需要放在数组中传入")
+    const func=Symbol();
+    mycontext.func=this;
+    let res;
+    if(args){
+        res=mycontext.func(...args);
+    }else{
+        res=mycontext.func();
+    }
+    delete mycontext.func;
+    return res;
+}
+//myBind实现
+//存在的问题：如果返回的函数作为构造函数，不会返回一个新的对象
+Function.prototype.myBind=function(context) {
+    const args=[...arguments].slice(1);
+    const func=this;
+    return function(){
+        return func.apply(context,args.concat([...arguments]))
+        
+    }
+    
+}
+//改进
+Function.prototype.myBind=function(context) {
+    const args=[...arguments].slice(1);
+    const func=this;
+    return function Fn(){
+        if(this instanceof Fn){
+            return func.apply(this,args.concat([...arguments]))
+        }else{
+            return func.apply(context,args.concat([...arguments]))
+        }     
+    }   
+}
+
+```
+
+
+
+【new】
+
+- new操作的本质目的：这里涉及到原型链的相关知识。主要是需要创建一个新对象，通过构造函数确定对象的原型对象，调用构造函数实现对新对象的初始化工作，并将这个新对象返回。
+
+  而这里需要注意的问题就是构造函数本身不是新对象的成员函数，因此需要借助apply方法，让新对象可以调用初始化函数从而实现自身的初始化
+
+  ```js
+  //使用myNew函数模拟new运算符的功能
+  function myNew(context){
+      if(typeof context !== 'function')
+      throw new Error("非构造函数")
+      let obj = new Object();
+      obj.__proto__=context.prototype;
+      let res = context.apply(obj,[...arguments].slice(1));
+      if (res){
+          return res;
+      }
+      return obj;
+  }
+  ```
+
+### 03-Promise
+
+#### Promise的理解
+
+promise是JavaScript用来完成异步操作的一个对象，它使得js中的异步代码更简洁易读易于维护。
+
+#### Promise的特点
+
+- Promise对象有三个状态：pending、fulfilled、rejected。这些状态设置的目的是为了能够在恰当的时机调用相应的回调函数。
+- Promise的回调：Promise使用then和catch方法分别接收Promise处于fulfilled和rejected状态时，设定好的的回调函数。
+- Promise的链式调用：Promise的then方法返回一个新的Promise对象，这方便用户将多个异步操作组合在一起，易于阅读和管理。
+
+#### Promise的设计
+
+整体来说细节比较多，这里首先针对几个值得讨论的点做一些理解阐述
+
+1. Promise的核心特性和方法
+
+   - resolve、reject方法，用来改变Promise对象的状态，由pending转为fulfilled或者rejected
+   - status变量，用来记录Promise对象的状态，状态有pending、fulfilled、rejected三种
+   - value、reason变量，分别用来记录结果和错误
+   - then、catch方法，分别用来接收fulfilled、rejected状态下需要执行的回调函数onFulfilledCallback、onRejectedCallback
+   - onFulfilledCallbacks，onRejectedCallbacks数组，分别用来储存fulfilled、rejected状态下需要执行的回调函数，并且在Promise
+   - executor执行器，使用resolve、reject方法作为参数，由用户设定，用户可以通过实现executor执行器中的逻辑，来改变Promise可能的状态变化
+
+2. then的工作流程梳理
+
+   <img src="E:\a_vscode_workspace\web_study\web_basic_notes\ref_img\promise.jpg">
+
+3. Promise的常用静态方法介绍：resolve、reject、all、race
+
+- resolve，用来包装非Promise对象，将其变为fulfilled的Promise对象，以及传递Promise对象
+- reject，用来包装非Promise对象，将其变为rejected的Promise对象
+- all，用来返回一组Promise对象的处理结果，或者返回第一个错误（返回一个Promise对象，值存储在它的value或者reason属性中）
+- race，用来返回一组Promise对象中第一个返回的处理结果，或者它的错误（返回一个Promise对象，值存储在它的value或者reason属性中）
+
+#### Promise的实现
+
+```js
+// MyPromise.js
+
+// 先定义三个常量表示状态
+const PENDING = 'pending';
+const FULFILLED = 'fulfilled';
+const REJECTED = 'rejected';
+
+// 新建 MyPromise 类
+class MyPromise {
+  constructor(executor){
+    // executor 是一个执行器，进入会立即执行
+    // 并传入resolve和reject方法
+    try {
+      executor(this.resolve, this.reject)
+    } catch (error) {
+      this.reject(error)
+    }
+  }
+
+  // 储存状态的变量，初始值是 pending
+  status = PENDING;
+  // 成功之后的值
+  value = null;
+  // 失败之后的原因
+  reason = null;
+
+  // 存储成功回调函数
+  onFulfilledCallbacks = [];
+  // 存储失败回调函数
+  onRejectedCallbacks = [];
+
+  // 更改成功后的状态
+  resolve = (value) => {
+    // 只有状态是等待，才执行状态修改
+    if (this.status === PENDING) {
+      // 状态修改为成功
+      this.status = FULFILLED;
+      // 保存成功之后的值
+      this.value = value;
+      // resolve里面将所有成功的回调拿出来执行
+      while (this.onFulfilledCallbacks.length) {
+        // Array.shift() 取出数组第一个元素，然后（）调用，shift不是纯函数，取出后，数组将失去该元素，直到数组为空
+        this.onFulfilledCallbacks.shift()(value)
+      }
+    }
+  }
+
+  // 更改失败后的状态
+  reject = (reason) => {
+    // 只有状态是等待，才执行状态修改
+    if (this.status === PENDING) {
+      // 状态成功为失败
+      this.status = REJECTED;
+      // 保存失败后的原因
+      this.reason = reason;
+      // resolve里面将所有失败的回调拿出来执行
+      while (this.onRejectedCallbacks.length) {
+        this.onRejectedCallbacks.shift()(reason)
+      }
+    }
+  }
+
+  then(onFulfilled, onRejected) {
+    const realOnFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+    const realOnRejected = typeof onRejected === 'function' ? onRejected : reason => {throw reason};
+
+    // 为了链式调用这里直接创建一个 MyPromise，并在后面 return 出去
+    const promise2 = new MyPromise((resolve, reject) => {
+      const fulfilledMicrotask = () =>  {
+        // 创建一个微任务等待 promise2 完成初始化
+        queueMicrotask(() => {
+          try {
+            // 获取成功回调函数的执行结果
+            const x = realOnFulfilled(this.value);
+            // 传入 resolvePromise 集中处理
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (error) {
+            reject(error)
+          } 
+        })  
+      }
+
+      const rejectedMicrotask = () => { 
+        // 创建一个微任务等待 promise2 完成初始化
+        queueMicrotask(() => {
+          try {
+            // 调用失败回调，并且把原因返回
+            const x = realOnRejected(this.reason);
+            // 传入 resolvePromise 集中处理
+            resolvePromise(promise2, x, resolve, reject);
+          } catch (error) {
+            reject(error)
+          } 
+        }) 
+      }
+      // 判断状态
+      if (this.status === FULFILLED) {
+        fulfilledMicrotask() 
+      } else if (this.status === REJECTED) { 
+        rejectedMicrotask()
+      } else if (this.status === PENDING) {
+        // 等待
+        // 因为不知道后面状态的变化情况，所以将成功回调和失败回调存储起来
+        // 等到执行成功失败函数的时候再传递
+        this.onFulfilledCallbacks.push(fulfilledMicrotask);
+        this.onRejectedCallbacks.push(rejectedMicrotask);
+      }
+    }) 
+    
+    return promise2;
+  }
+    catch(onRejectedCB){
+        this.then(null,onRejectedCB);
+    }
+
+  // resolve 静态方法
+  static resolve (parameter) {
+    // 如果传入 MyPromise 就直接返回
+    if (parameter instanceof MyPromise) {
+      return parameter;
+    }
+
+    // 转成常规方式
+    return new MyPromise(resolve =>  {
+      resolve(parameter);
+    });
+  }
+
+  // reject 静态方法
+  static reject (reason) {
+    return new MyPromise((resolve, reject) => {
+      reject(reason);
+    });
+  }
+  //all
+  static all(promises){
+    const N=promises.length
+    const res=[];
+    let count=0;
+    return new MyPromise((resolve,reject)=>{
+        promises.forEach((promise,i)=>{
+            MyPromise.resolve(promise).
+            then((value)=>{
+                res[i]=value;
+                count++;
+                if(count===N)
+                    resolve(res)
+            }).catch(reject)
+            
+        })
+    })
+  }
+    //race
+ static race(promises){
+     return new MyPromise((resolve,reject)=>{
+         promises.forEach((promise)=>{
+             MyPromise.resolve(promise).
+                 then(resolve,reject)
+         })
+     })
+ }
+}
+
+
+function resolvePromise(promise2,x,resolve,reject){
+  if(promise2===x)
+      throw new TypeError("Chaining cycle detected for promise #<Promise>")
+  if(typeof x==='object'||typeof x ==='function'){
+      if(x===null)
+          resolve(x);
+      let then;
+      try{
+         then=x.then 
+      }
+      catch(err){
+          reject(err)
+      }
+      if(typeof then==='function'){
+          x.then(resolve,reject)
+      }
+      else{
+          resolve(x)
+      }
+  }else{
+      resolve(x)
+  }
+}
+
+```
+
+### 04-防抖
+
+#### 防抖 (debounce)概念
+
+在一段时间内连续地触发同一个事件，只执行第一次或者最后一次触发操作。适用于需要等待用户停止操作后才执行的操作，比如输入框搜索功能。
+
+#### 防抖的实现
+
+debounce(handler,wait,immediate)
+
+- handler——需要进行防抖处理的事件处理程序
+- wait——限定不能连续触发事件的时间段
+- immediate——在时间段内，设定执行第一次操作还是最后一次操作
+
+返回值：返回防抖函数包装好的事件处理程序函数，也可以理解为新的事件处理程序
+
+【基本功能】
+
+1. 使用定时器：
+
+   在debounce函数中声明一个定时器变量timer（未设置状态timer==null）
+
+   - case1-执行最后一次：如果timer处于未设置状态，就设置一个wait时间后触发的handler；==如果timer处于设置状态，就清除当前timer==，再设置一个wait时间后触发的handler的计时器
+   - case2-执行第一次：如果timer处于未设置状态,就调用handler，并且在wait时间后将timer重新设置为未设置状态；==如果timer处于设置状态，就清除当前timer==，并且设置一个wait时间后将timer重新设置为未设置状态的计时器
+
+2. 使用immediate参数：目的是让使用者通过设定参数就可以决定执行的时间点，而不需要编写两个debounce函数
+
+   可以总结发现，case1和case2中当timer处于设置状态时，都需要把当前的计时器清空，可以把这个逻辑提取出来放在前面，之后再通过参数immediate进行分支判断，执行case1或者case2的逻辑
+
+【实现细节】
+
+1. this
+
+   在事件处理程序中，this必须指向事件对象（某个页面上的dom元素），而当使用了debounce封装事件处理程序，其中原本的处理程序（handler）this不指向事件对象，而是指向了window，导致了问题。因此需要将debounce的返回的新处理程序所获取到的this，通过bind、apply绑定到初始的执行函数handler上
+
+2. event
+
+   事件处理程序（事件发生后的回调函数）有event事件对象作为参数。而当debounce封装了事件处理程序之后，新处理程序的参数（包含event对象）没有传递给原本的处理程序（handler），导致原本处理程序中对于event的使用失效，所以要把arguments对象也通过bind、apply绑定到初始的执行函数handler上
+
+3. 取消按钮
+
+   根据立即执行的设计思路，如果等待timer被重置需要等到最后一次操作经过n时间，所以给防抖封装增加一个方法，直接将timer赋值为null，调用它后处理程序在事件发生后立即被调用。
+
+【代码实现】
+
+```js
+function debounce(func,wait,immediate){
+    let timer;
+    return function(){
+        //container
+        const context=this;
+        const args=arguments;
+        let res;
+        if(timer) 
+            clearTimeout(timer);
+        if(immediate){
+            let nowCall=!timer;
+            //事件触发wait时间后，timer回到最初状态，最后一次周期内触发的wait之后，timer清空
+            timer=setTimeout(function(){timer=null},wait);
+            //第一次触发，调用处理程序
+            if(nowCall){
+                //可能会有返回值，在这里返回
+                res=func.apply(context,args);
+            }
+        }
+        else{
+            //指定func的this指向container
+            timer=setTimeout(func.bind(context,args),wait);
+            
+        }
+            console.log("newHandler的this指向：",this)
+            return res;
+    }
+
+}
+```
+
+
+
+学习来源：
+
+https://github.com/mqyqingfeng/Blog/issues/22
+
+#### 防抖的应用场景
+
+1. 窗口大小调整时触发重排：因为用户自己可能也需要多次调整大小找到最适合的尺寸。
+2. 避免重复提交、点击事件：在网站表单提交时，用户可能会多次点击提交按钮，导致多次提交表单。尤其时当页面的响应比较慢，用户自己也不确定是否提交成功，容易发生多次提交。
+
+### 05-节流
+
+#### 节流 (throttle)概念
+
+每隔一段时间执行一次回调函数，比如每 100 毫秒执行一次，而不管事件触发频率。适用于需要频繁触发事件但又不需要每次都执行回调函数的情况，比如滚动事件、鼠标移动事件等。
+
+#### 节流的实现
+
+throttle(wait,handler)
+
+- wait，wait时间内只执行一次事件处理程序
+- handler，事件本身的处理程序
+
+1. 时间戳
+
+   记录上一次触发的时间戳和本次触发的时间戳，以此计算出时间差，根据时间差和wait之间的比较，决定是否调用处理程序。保证在wait时间内只调用一次处理程序。
+
+   细节：这里的pretime和防抖中的定时器timer一样，对于同一个具体的事件，在多次处理程序被调用时，它们访问的都是同一个pretime。是通过闭包实现的。
+
+   ```js
+   function throttle_time(wait,handler){
+       let pretime=0;
+       return function(){
+           const context=this;
+           const args=arguments;
+           let nowtime=+new Date();
+           if(nowtime-pretime>wait){
+               handler.apply(context,args);
+               pretime=nowtime;
+           }
+       }
+   }
+   ```
+
+   
+
+2. 定时器
+
+   【注意区分】
+
+   防抖是在最后一次触发之后执行，如果一直持续触发事件不停止，会一直看不到事件执行
+
+   节流是在一段时间内只触发一次处理程序，因而如果触发了事件，那么在wait时间内必然会执行一次处理程序
+
+   具体的实现方式如下：
+
+   ```js
+   function throttle_timer(wait,handler){
+       let timer=null;
+       return function(){
+           const context=this;
+           const args=arguments;
+           if(timer===null){
+               setTimeout(function(){
+                   timer=null;
+                   handler.apply(context,args);
+               },wait)
+           }
+       }
+       
+   }
+   ```
+
+   
+
+3. 时间戳+定时器
+
+   pretime——用于记录上一次的执行时间点，每次执行handler的时候都需要更新它
+
+   timer——定时器，根据需要设定
+
+   事件触发后...
+
+   1. 计算剩余时间remainings，如果remainings<=0，说明上一个时间周期结束，那么可以执行处理程序了
+   2. 如果remainings>0，说明在wait时间周期内。
+      - 如果此时存在一个timer，在这个周期内曾有触发过事件，不需要重新设置timer，不需要做任何操作
+      - 如果不存在timer，则需要设置一个timer，在remainings时间后执行，同时也清除掉这个周期中的定时器。目的是保证这个周期内执行一次handler。
+
+4. 头尾问题（待学习）
+
+   在上述设定中，在n时间内触发事件，开始时会调用处理程序，remaings时间后也会调用处理程序，因此设计leading和tailing两个属性来控制调用处理程序的时机
+
+学习来源：https://github.com/mqyqingfeng/Blog/issues/26
+
+
+### 06-原型链相关手写
+
+#### 原型链的基础知识
+
+自顶向下来看：
 
 1. 顶层对象：js中设计了Object.prototype和它的构造函数Object
    - 对象原型没有进一步的源头了，所以`Object.prototype.__proto__==null`
    - 对象构造器是一个构造器对象，所以`Object.__proto__==Function.prototype`
-
 2. 顶层构造器：js中设计了Function.prototype和它的构造函数Function
-   - 由于它本身也是对象，`Function.prototype.__proto__==Object.prototype`
+   - 由于构造器原型本身也是对象，`Function.prototype.__proto__==Object.prototype`
    - 函数构造器是一个构造器对象，所以`Function.__proto__==Function.prototype`
 
 3. 普通对象：每个对象都有`__proto__`属性（原型链属性，js中的非标准属性，可以使用Object.getPrototypeOf获得），它指向对象的原型对象，也可以理解为是对象的构造函数的prototype所指向的对象。
+4. 构造器：构造器不仅有`__proto__`属性，同时也有`prototype`属性，前者指向构造器作为一个对象本身，这个对象的原型，后者指向构造器构造出来的对象的原型对象。
+5. 对象原型：对象原型包含了对象可以使用的属性和方法。
 
-4. 原型对象：原型对象的`__proto__`属性指向它父类的原型对象，实现了js中的继承，原型对象中包含了对象可以使用的属性和方法。
+#### instanceof
 
-5. 构造器：构造器不仅有`__proto__`属性，同时也有`prototype`属性，前者指向函数原型对象，后者指向构造器构造出来的对象的原型对象。
+沿着对象的原型链进行查找（循环），如出现了要匹配原型对象，就说明是子类，反之则不是
+
+#### new操作符
+
+a. JavaScript 引擎会创建一个新对象，并将该对象的原型指针指向构造函数的 prototype 对象。
+
+b. JavaScript 引擎会使用 apply 方法调用构造函数，并传入新创建的对象作为 this 参数。这样一来，我们就可以在构造函数内部使用 this 关键字来初始化新对象的属性。
+
+c. JavaScript 引擎会返回新创建的对象。
+
+### 07-数组扁平化
+
+学习来源：[JavaScript专题之数组扁平化 · Issue #36 · mqyqingfeng/Blog (github.com)](https://github.com/mqyqingfeng/Blog/issues/36)
+
+1. 数组扁平化的本质是通过递归
+
+2. 为了让扁平化函数能够为其他的工具函数更好地提供扁平化功能，
+
+   设置了strict属性，可以在扁平化的过程中去除那些非数组的元素
+
+   设置了shallow属性，可以只扁平化一层，而不进行递归
+
+3. 应用场景，比如让`[1,2,[3,4,5],[6,5,7]]`转化为`[3,4,5,6,5,7]`就可以设置strict=true，shallow=true
+
+### 08-reduce的实现
+
+实际上Array的函数，接收处理函数的回调函数，回调函数就像一套处理程序，给数组迭代的处理，最后返回想要的结果，其中很多中间量是保存在Array函数中的
+
+### 09-去重
+
+去重是指从一个集合中删除重复的元素，以便只保留独特的元素。集合可以是数组、对象、字符串等。
+
+本例中主要实现了三种去除数组中重复元素的方法。
+
+## ES6
+
+### var let const
+
+1. var声明的变量可以在全局作用域和函数作用域使用
+2. 使用var声明会有变量提升的效果，变量提升是指可以在未声明前使用变量，但是此时的值是undefined
+3. let和const声明的变量可以在全局作用域、函数作用域和块级作用域使用
+4. const声明常量是常量，因此它声明时必须要赋值，同时赋值之后值不能修改
+5. 死区的概念：使用let或者const声明，在作用域开始到声明之间的区域是死区，在此区间访问变量会报错
+
+### 箭头函数
+
+目的：适用于创建执行一次的函数，语法上非常的简洁
+
+特点：
+
+1. 箭头函数没有自己的this，它继承外部函数的this。如果箭头函数没有外部函数，则它的this指向全局对象（浏览器环境下是window对象）。
+
+2. 箭头函数没有arguments对象
+
+3. 箭头函数不能用来实例化对象，因为它没有this
+
+   （个人理解，this指向某个对象，这个对象就像是函数的主人，箭头函数没有this所以它就不属于某个对象，可以把箭头函数和构造函数对照起来看)
+
+### 数组方法
+
+【备注】这个不是ES6新增的，但是很常用很好用
+
+**不修改原数组**
+
+1. map
+
+   ```js
+   let arr=[1,2,3,4,5]
+   //每个数字*2返回新数组
+   const arr_new = arr.map((item,index)=>{
+       return item*2
+   })
+   arr_new
+   ```
+
+   
+
+2. reduce
+
+   ```js
+   let arr=[1,2,3,4,5]
+   //arr数组求和
+   const sum = arr.reduce((pre,next)=>{
+       return pre+next
+   },0)
+   sum
+   ```
+
+   
+
+3. filter
+
+   ```js
+   let arr=[1,2,3,4,5]
+   //筛选出大于3的数字
+   const arr_new = arr.filter((item,index)=>{
+       return item>3
+   })
+   arr_new
+   ```
+
+   
+
+4. forEach
+
+   ```js
+   let arr=[1,2,3,4,5]
+   //遍历arr
+   arr.forEach((item,index)=>{
+       console.log(index,item)
+   })
+   ```
+
+**修改数组方法**
+
+1. pop&push、shift&unshift
+
+2. splice：主要用于数组特定位置的删除和修改
+
+   ```js
+   arr.splice(start[, deleteCount, elem1, ..., elemN])
+   ```
+
+   - `start`——需要删除元素的索引位置
+   - `deletCount`——从该位置开始需要删除的元素个数
+   - `elem1, ..., elemN`——从该位置开始替换的新元素
+
+### Rest参数
+
+当函数接收参数数量不确定时，可以用rest语法将多出来的参数都收集到一个数组中
+
+### Spread语法
+
+Spread语法是指使用 `...` 将一个可迭代对象或者类数组对象展开为一个新的数组。这个特性可以方便地合并数组、复制数组、合并对象等操作，提高编码效率。
+
+### 可迭代对象、类数组对象和它们之间的转化
+
+- 可迭代对象是实现了`obj[Symbol.iterator]()` 方法的对象，之后可以通过for...of的方法循环该对象（常见的可迭代对象：字符串、数组）
+- 类数组对象是可以通过索引访问元素并且有`length`属性，但不能使用数组的内置方法（常见的类数组对象：函数的 `arguments` 对象）
+- 它们都不一定是真正的数组对象，可以使用spread语法或者Array.from方法将它们转为真正的数组对象
+
+### 解构可迭代对象和对象
+
+1. 解构可迭代对象
+
+   ```js
+   let arr=[1,2,3,4,5]
+   let [num1,num2,num3=0,...rest]=arr
+   结果：num1=1,num2=2,num3=3,rest=[4,5],其中num3的默认值为0
+   ```
+
+2. 解构对象
+
+   ```js
+   let bar={
+   	height:200,
+   	width:100,
+   	title:'sidebar',
+   	color:'indigo'
+   }
+   let {height:h=100,width:w,...rest}=bar;
+   结果：h=200,w=100,rest={title:'sidebar',color:'indigo'},其中通过属性名来映射，赋值给变量h和w
+   ```
 
 
-原型链的应用:
+### Promise
 
-1. new操作符的执行流程
+本质：Promise是用来进行js中异步编程的对象
 
-   a. JavaScript 引擎会创建一个新对象，并将该对象的原型指针指向构造函数的 prototype 对象。
+1. 三个状态：pending、fulfilled、rejected
+2. 执行器executor(resolve,reject)，在构造器中执行，根据不同情况进行逻辑判断，分别调用resolve,reject改变promise的状态，并且接受value值或者错误对象reason
+3. then(onFulfilledBC,onRejectedBC)，传入针对value和reason的回调函数
 
-   b. JavaScript 引擎会使用 apply 方法调用构造函数，并传入新创建的对象作为 this 参数。这样一来，我们就可以在构造函数内部使用 this 关键字来初始化新对象的属性。
+### async/await（ES8）
 
-   c. JavaScript 引擎会返回新创建的对象。
+本质：是一种处理异步操作的语法糖，目的是为了进一步简化异步操作
 
-2. Object.create(proto)的执行流程
+1. 对于async声明为异步函数的理解
 
-   1. 创建一个新对象
-   2. 将该对象的原型指针指向我们传入的原型对象
-   3. 返回新对象
+   当一个函数需要等待异步操作完成后，对结果进行处理，或者等待异步操作完成后再继续执行时（函数中出现await关键字）需要声明为异步函数
+
+   异步函数自动将返回结果封装在Promise中返回；如果异步函数没有设定显式的返回结果，那么它会将函数中拿到的最后一个异步结果封装在Promise中返回
+
+2. await是用来等待接收async函数结果的关键字
+3. 通过try...catch可以捕获await过程中可能抛出的异常
 
 ## Vue-basic
 
@@ -968,7 +1703,25 @@ diff算法的设计与实现理解：
 
 #### localStorage&sessionStorage
 
-1. 简述：前端应用程序生成或维护的数据，长期保存在本地存储。同时不像cookie会在http请求中发送。是HTML5新增的一种本地存储机制。有相关的api对其进行设置获取移除等。与 `localStorage` 不同的是，`sessionStorage` 中存储的数据在会话结束时会被自动清除，而不是永久存储在浏览器中。
+前端应用程序生成或维护的数据，长期保存在本地存储。同时不像cookie会在http请求中发送。是HTML5新增的一种本地存储机制。有相关的api对其进行设置获取移除等。有常用的 `localStorage` 和`sessionStorage` 
+
+1. 生命周期
+
+localStorage：存储的数据没有过期时间，除非被手动删除，否则一直存在。
+
+sessionStorage：存储的数据只在当前会话有效，当浏览器窗口关闭后，数据就被清空了。但是页面刷新不会影响它
+
+2. 作用域
+
+localStorage：存储的数据是在同一个域名下共享的，不同的页面可以共享同一组 localStorage 数据。
+
+sessionStorage：存储的数据是在同一个窗口（或者标签页）下共享的，不同的窗口（或者标签页）之间无法共享 sessionStorage 数据。
+
+3. API
+
+localStorage 和 sessionStorage 的 API 非常相似，都是通过键值对的方式来存储数据。
+
+使用 localStorage 和 sessionStorage 时需要注意的是，它们只能存储字符串类型的数据，如果需要存储其他类型的数据，需要先将其转换为字符串格式。
 
 （待学习考证）
 
@@ -1043,6 +1796,8 @@ OPTIONS: 列出可对资源实行的请求方法，用来跨域请求
    - 锚点
 
 #### 状态码
+
+服务器向客户端返回的状态码，用于表示客户端请求的处理结果
 
 - **1xx**: 表示目前是协议处理的中间状态，还需要后续操作。
 
@@ -1182,7 +1937,7 @@ http/1.1的策略
 
    协商缓存是一种缓存策略，通过在请求头和响应头中添加特定的信息来判断资源是否需要从服务器获取，以减少不必要的数据传输和服务器负载。
 
-   协商缓存的实现需要用到两个 HTTP 头：`If-Modified-Since` 和 `Last-Modified`，以及 `If-None-Match` 和 `ETag`。
+   协商缓存的实现需要用到两个 HTTP 头：`If-Modified-Since` 和 `Last-Modified`，以及 `If-None-Match` 和 `ETag`。客户端第一次请求该资源时，服务器会将资源的内容和 Last-Modified、ETag 值一起返回给客户端。
 
    1. Last-Modified 和 If-Modified-Since
 
@@ -1335,7 +2090,3 @@ http/1.1的策略
 基于nodejs serve服务环境进行渲染，所有的html代码在服务器端渲染。
 
 优点：首屏加载速度快，利于seo
-
-### ES6数组api
-
-- splice(startIndex,deleteCount,新增内容)。号称数组处理的瑞士军刀，非常好用。

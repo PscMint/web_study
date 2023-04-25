@@ -67,4 +67,4 @@ function throttle_3(func,wait){
     }
     return throttled;
 }
-container.onmousemove=throttle_3(getUserAction,10000)
+container.onmousemove=throttle_3(getUserAction,3000)
