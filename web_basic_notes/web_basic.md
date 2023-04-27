@@ -1082,7 +1082,46 @@ Spread语法是指使用 `...` 将一个可迭代对象或者类数组对象展�
 
 2. await是用来等待接收async函数结果的关键字
 3. 通过try...catch可以捕获await过程中可能抛出的异常
-
+```js
+class HttpError extends Error {
+  constructor(response) {
+    super(`${response.status} for ${response.url}`);
+    this.name = 'HttpError';
+    this.response = response;
+  }
+}
+async function loadJson(url){
+    let response=await fetch(url);
+    if(response.status==200){
+        return response.json();
+    }
+    else{
+        throw new HttpError(response);
+    }
+}
+async function demoGithubUser(){
+    let user;
+    let name = prompt("Enter a name?", "iliakan");
+    try{
+    user=await loadJson(`https://api.github.com/users/${name}`);  
+    }
+    catch(err){
+      if(err instanceof HttpError && err.response.status==404){
+         alert("No such user, please reenter.");
+        return demoGithubUser();
+      }
+       else{
+           throw err;
+       }
+          
+    }
+    alert(user.name);
+    return user;
+    
+    
+}
+demoGithubUser()
+```
 ## Vue-basic
 
 ### Vue渐进式
@@ -1816,11 +1855,11 @@ OPTIONS: 列出可对资源实行的请求方法，用来跨域请求
 
 - **3xx**: 重定向状态，资源位置发生变动，需要重新请求。（301 302 304）
 
-  301是永久重定向，意味着请求的资源已经被永久移动到了一个新的位置，并且所有后续请求都应该使用新的 URL。301 响应的资源被浏览器缓存，因此在再次请求相同资源时，浏览器会自动使用重定向后的 URL。
+  301是永久重定向，意味着请求的资源已经被永久移动到了一个新的位置，并且所有后续请求都应该使用新的 URL。301 响应新的URL被浏览器缓存，因此在再次请求相同资源时，浏览器会自动使用重定向后的 URL。
 
-  302 是临时重定向，表示请求的资源暂时在不同的位置，所有后续请求都应该使用新的 URL，但未来可能会改变回原始位置。302 响应的资源不会被浏览器缓存，因此在再次请求相同资源时，浏览器会再次发送原始请求并获取响应。
+  302 是临时重定向，表示请求的资源暂时在不同的位置，所有后续请求都应该使用新的 URL，但未来可能会改变回原始位置。302 响应的URL不会被浏览器缓存，因此在再次请求相同资源时，浏览器会再次发送原始请求并获取响应。
 
-  304 使用浏览器缓存的资源版本
+  304 使用浏览器缓存的资源版本，是协商缓存后确认缓存未过期后，从浏览器的缓存中读取资源。
 
 - **4xx**: 请求报文有误。（400 403 404）
 
