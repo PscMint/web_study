@@ -930,6 +930,201 @@ reduce作为数组的方法，内部的this指向调用它的数组本身，而�
 1. Set去重+可迭代对象结构
 2. reduce+include：把先前没有加入的新元素在reduce遍历的过程中加进来
 3. filter+indexOf：筛选出在数组中的位置和遍历位置一致的元素
+### js作用域
+
+- 全局作用域：
+
+  使用var在最外层函数的外部声明的变量，可以自动提升
+
+  使用let在最外层函数的外部声明的变量，只能覆盖它以下的范围
+
+  在最外层函数的外部未经声明的变量，和var的效果一样，全局变量+自动提升
+
+- 函数作用域：
+
+  在函数内部声明的变量（var，let，const）只能在函数内部访问
+
+  在函数内部未经声明的变量，和let声明的变量效果一致，在函数内可以覆盖它下面的范围
+
+- 块作用域：
+
+  let，const在块内声明的变量，只能在块中访问；var在块内声明的变量，成为全局变量自动提升
+
+es5只有全局和函数作用域，只有var声明
+
+### 静态作用域&动态作用域
+
+- 静态作用域：函数的作用域时在函数定义的时候确定的
+- 动态作用域：函数的作用域是在函数调用的时候确定的
+js是基于静态作用域的，在编写代码的时候就知道变量作用域了，和运行时的情况无关
+
+### 执行上下文
+对于每一段可执行代码都有它的执行上下文，用来描述代码运行时的环境
+
+包含以下三个重要属性：
+
+- 变量对象(Variable object，VO)
+- 作用域链(Scope chain)
+- this
+
+### 执行上下文栈
+
+js中用来管理执行上下文的数据结构
+
+基本流程
+
+1. 将全局执行上下文压入栈中
+2. 当遇到需要执行的函数，将该函数的执行上下文压入栈中
+3. 当函数执行完毕，将该函数的执行上下文从栈中弹出
+4. 全局执行上下文最后出栈
+
+### 变量对象
+
+- 全局对象：可以访问到js预定义的对象、函数、属性
+
+  > 全局对象是预定义的对象，作为 JavaScript 的全局函数和全局属性的占位符。通过使用全局对象，可以访问所有其他所有预定义的对象、函数和属性。
+
+- 变量对象：把变量对象看作是一种规范，但它并不通用，需要将它转化为变量对象放在函数的执行上下文对象中，这个变量对象才被激活，它的属性才能被访问到
+
+  > 活动对象和变量对象其实是一个东西，只是变量对象是规范上的或者说是引擎实现上的，不可在 JavaScript环境中访问，只有到当进入一个执行上下文中，这个执行上下文的变量对象才会被激活，所以才叫activation object呐，而只有被激活的变量对象，也就是活动对象上的各种属性才能被访问。
+
+变量对象（这里的变量对象是函数）包括的内容：
+
+- 函数的所有形参
+- 函数中的变量声明
+- 函数中的函数声明
+
+### 作用域链
+
+scope，简单理解就是这里有该函数可以访问的由近到远的变量对象，也是通过scope来查找变量的值
+
+比如functionA内部声明了functionB那么B的scope链为：`[AO,contextA.AO,globalConext.VO]`
+
+注意区分作用域链和执行上下文
+
+**执行上下文在运行时确定，随时可能改变；作用域在定义时就确定，并且不会改变**。
+
+### this指向问题
+
+基于规范的理解相对比较复杂，自有它的一套判断机制。
+
+通常情况下，关注调用函数的对象，如果是某个对象，this指向该对象；如果是在全局环境下调用，this为undefined，非严格模式下指向window。并非适用于全部的情况。
+
+### 闭包
+
+含义
+
+在 JavaScript 中，每当创建一个函数，闭包就会在函数创建的同时被创建出来。可以在一个内层函数中访问到其外层函数的作用域。闭包是指那些能够访问自由变量的函数。自由变量是指在函数中使用的，但既不是**函数参数**也不是**函数的局部变量**的**变量**。 
+
+### 一些例子
+
+1. 陷阱题
+
+```js
+function Foo(){
+	getName = function(){
+		console.log(1);					
+        };
+	return this
+}
+			
+function getName(){
+	console.log(5);
+}
+
+Foo().getName();//1
+```
+
+this指向的是window，但是在Foo()被调用的过程中，getName的值被Foo()修改了（改变了全局变量getName的值）
+
+2. 作用域链
+
+```js
+var scope = "global scope";
+function checkscope(){
+    var scope = "local scope";
+    function f(){
+        return scope;
+    }
+    return f();
+}
+checkscope();//"local scope"
+```
+
+scope是一个自由变量，它的取值需要通过作用域链，`[AO,checkscopeContext.AO,globalContext.VO]`，在`checkscopeContext.AO`中存在scope的值，所以返回“local scope”
+
+3. 闭包
+
+```js
+var scope = "global scope";
+function checkscope(){
+    var scope = "local scope";
+    function f(){
+        return scope;
+    }
+    return f;
+}
+
+var foo = checkscope();
+foo();//"local scope"
+```
+
+可以发现，本例中checkscope调用结束，它已经出执行上下文栈，但依然可以从其内部返回f函数，是通过作用域链实现的，这也符合闭包的特点
+
+4. 循环的不同
+
+```js
+var data = [];
+
+for (var i = 0; i < 3; i++) {
+  data[i] = (function (i) {
+        return function(){
+            console.log(i);
+        }
+  })(i);
+}
+
+data[0]();
+data[1]();
+data[2]();
+
+```
+
+这里可以分别打印出0，1，2，是因为作用域链为`[AO,匿名Context.AO,globalContext.VO]`，在每一轮中创建新的匿名函数后被销毁，参数i的值随着循环变化，内部的函数访问的也是这个匿名函数的参数i
+
+```js
+var data = [];
+
+for (var i = 0; i < 3; i++) {
+  data[i] =  function(){
+            console.log(i);
+        }
+}
+
+data[0]();
+data[1]();
+data[2]();
+```
+
+这里打印结果都是3，是因为作用域链为`[AO,globalContext.VO]`，这里的i是一个全局变量，访问的也是i经过循环最后产生的值
+
+5. 静态作用域
+
+```js
+function myprint(fn) {
+  const a = 200;
+  fn();
+}
+
+const a = 100;
+function fn() {
+  console.log(a);
+}
+
+myprint(fn); // 100
+```
+
+自由变量a的取值与函数定义的位置相关（形成了作用域链），而与函数的调用位置无关
 
 ## ES6
 
