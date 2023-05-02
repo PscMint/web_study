@@ -1326,6 +1326,250 @@ async function demoGithubUser(){
 }
 demoGithubUser()
 ```
+### 类
+
+#### class的实现原理
+
+MyClass本质是一个函数，`MyClass==MyClass.prototype.constructor`
+
+类里面的constructor、methods、getters、setters都会写进类的原型中（`MyClass.prototype`）
+
+构造器里面的字段不会写进原型中，而是会单独分配给每个对象中，作为对象的属性
+
+#### new的行为
+
+*针对于通常的类，不包含类继承的情况*
+
+1. 调用构造器，开辟一段内存空间，使用this指向它，执行构造器中的语句，一般来说会绑定一些属性
+2. 将创建好的对象，通过指针[[prototype]]指向这个类的原型，类的原型本身也是一个对象，其中包括了类中的构造器和所有方法
+
+*类继承的情况*
+
+1. 父类的构造器必须被调用，因此需要使用super来首先使用super来调用父类的构造器，再调用子类的构造器语句。没有子类的构造器时，会默认调用父类的构造器
+2. 搭建对象和原型对象之间的指针，形成原型链
+
+#### class语法
+
+```js
+class MyClass {
+  prop = value; // 属性
+
+  constructor(...) { // 构造器
+    // ...
+  }
+
+  method(...) {} // method
+
+  get something(...) {} // getter 方法
+  set something(...) {} // setter 方法
+
+  [Symbol.iterator]() {} // 有计算名称（computed name）的方法（此处为 symbol）
+  // ...
+}
+```
+
+#### 继承extends
+
+1. js中继承的语法
+
+```js
+class Animal{}
+class Rabbit extends Animal{}
+```
+
+2. 方法的重写
+
+使用super可以对于父类中的方法进行调用
+
+```js
+class Rabbit extends Animal{
+hide(){
+    alert(`${this.name} hides.`)
+}    
+stop(){
+    super.stop();
+    this.hide();
+}
+}
+```
+
+3. 重写类字段
+
+这里需要了解一个顺序，在创建有父类的对象时，对象的内存陆续添加以下内容：
+
+1. 父类的类字段
+2. super构造器带来的属性
+3. 子类的类字段
+4. this构造器带来的属性
+
+所以在这个过程中，假设我们不编写子类的构造器，而在父类的构造器中访问在子类中重写的类字段，会出现错误，因为子类的类字段还没有对父类的字段进行覆盖，示例如下：
+
+```js
+class Animal{
+    flurry=false;
+    constructor(){
+        console.log(`${this.flurry}`)
+        console.log("parent cons")
+    }
+}
+class Rabbit extends Animal {
+    flurry=true;
+    constructor() {
+        super()
+        console.log(`${this.flurry}`)
+        console.log("child cons")
+    }
+}
+new Rabbit()
+____________________________________________________________
+false
+parent cons
+true
+child cons
+```
+
+#### 静态方法和静态属性
+
+1. 静态方法
+
+```js
+class Animal{
+    constructor(name,speed){
+        this.name=name;
+        this.speed=speed;
+    }
+    static compare(ani1,ani2){
+        return ani1.speed-ani2.speed;
+    }
+}
+```
+
+
+
+- 静态方法是类本身具有的一种方法，所以在使用的时候我们也是通过类名来调用它
+
+- 在存储上，静态方法存放在类（作为一个函数）自己的内存空间中，详细可以参下图，compare就是一个Animal的静态方法
+
+- 静态方法可以被继承，实现的方法是通过在`Rabbit`和`Animal`之间连接`[[prototype]]`
+
+2. 使用静态方法来创建对象
+
+工厂方法，this指向的是Stu，最终仍然是调用了构造器
+
+```js
+class Stu{
+    constructor(name,time){
+        this.name=name;
+        this.time=time;
+    }
+    static createTodayStu(name){
+        return new this(name,Date.now())
+    }
+}
+let stu=Stu.createTodayStu('Lily')
+```
+
+3. 静态属性
+
+```js
+class Animal{
+    static planet='Earth';
+    constructor(name,speed){
+        this.name=name;
+        this.speed=speed;
+    }
+    static compare(ani1,ani2){
+        return ani1.speed-ani2.speed;
+    }
+}
+Animal.planet;
+```
+
+#### 私有的和受保护的属性和方法
+
+1. 受保护的属性
+
+_属性名
+
+1. 将属性设置为受保护的类型，可以同时为它设置一个访问器，我们只通过访问器对它进行get和set，在编写get和set的过程中就可以限制受保护属性值的改变情况。
+
+2. 受保护的属性是可以被继承的
+
+   针对1中描述的情况举例
+
+   ```js
+   //小组活动的次数只能是非负数
+   class Group{
+       constructor(name,count){
+           this.name=name;
+           this._count=count;
+       }
+       get count(){
+           if (this._count<0)
+              return 0;
+           else
+              return this._count;
+       }
+       set count(count){
+           if (count<0)
+               this._count=0;
+           else
+              this._count=count;
+       }
+   }
+   ```
+
+3. 私有的属性
+
+#属性名
+
+1. 私有的属性只能在类的内部被访问
+2. 私有属性不能够被继承
+
+#### 扩展内建类
+
+1. 可以让新的类继承自js中的内建类，以此来给他们增加功能，以下例子：
+
+   众所周知，js数组实现了pop和push的功能，传统的stack一般来说还需要有判空函数，因此正好可以基于Array进行扩展
+
+   ```js
+   class Stack extends Array{
+       isEmpty(){
+           if(this.length==0)
+               return true;
+           else
+               return false;
+       }
+   }
+   ```
+
+2. 内建类之间的继承是不会继承静态方法的，比如说Date继承自Object，但是Object的静态方法key和value，Date是没有的。
+
+#### 类检查 instanceof
+
+1. instanceof是一个操作符，它可以判断一个对象是否属于某一类。
+
+   - 考虑了继承，会将原型链考虑在内，只要类在对象的原型链上都会返回true
+
+2. instanceof运算符的执行流程
+
+   1. 系统内部的[Symbol.hasInstance]方法（`@params:obj @return {boolean}`）：可以允许用户自己定义判断一个对象是否属于该类的方法
+
+   2. 一般来说[Symbol.hasInstance]是没有定义的，所以js会判断对象的原型是否是类的prototype，以及原型的原型
+
+      ```js
+      obj.__proto__ === Class.prototype
+      obj.__proto__.__proto__ === Class.prototype
+      obj.__proto__.__proto__.__proto__ === Class.prototype
+      ...
+      // 如果任意一个的答案为 true，则返回 true
+      // 否则，如果我们已经检查到了原型链的尾端，则返回 false
+      ```
+
+3. 使用`Object.prototype.toString.call(obj)`可以直接判断某对象属于原始类型和内建类中的哪一种，之所以要将toString借出是因为`obj.toString`和可能在继承了Object之后根据实际的需要重写toString方法，比如一些类型的特定转换方式，number转成string，而无法用于判断类型
+
+   如果想让自己定义的类也通过上述的方法确定对象的类型，需要在类中给[Symbol.toStringTag]赋值类名
+
 ## Vue-basic
 
 ### Vue渐进式
@@ -1991,6 +2235,164 @@ localStorage 和 sessionStorage 的 API 非常相似，都是通过键值对的�
 | 清除方法     | 可以通过设置过期时间或者手动清除 | 可以手动清除                               |
 ### TCP三次握手四次挥手
 #### 基础概念
+
+   1. TCP的概念
+
+      面向连接的、可靠的、基于字节流的传输层通信协议
+
+      解读：
+
+      - 面向连接，TCP报文的传输需要在连接建立的基础上
+      - 可靠的，TCP报文最终一定会到达接受收方
+      - 基于字节流的，以TCP报文的方式传出数据，并且按照顺序接收
+
+   2. TCP连接
+
+      客户端和服务器达成的三个共识
+
+      - sockets
+      - 序列号
+      - 窗口大小
+
+      确定一个TCP连接的四要素：
+
+      源地址、目标地址（IP数据包）、源端口、目标端口（TCP报文）
+
+   3. TCP报文的格式
+
+      ![TCP 头格式](D:./ref_img/format,png-20230309230534096.png)
+
+      **序列号**：在建立连接时由计算机生成的随机数作为其初始值，通过 SYN 包传给接收端主机，每发送一次数据，就「累加」一次该「数据字节数」的大小。**用来解决网络包乱序问题。**
+
+      **确认应答号**：指下一次「期望」收到的数据的序列号，发送端收到这个确认应答以后可以认为在这个序号以前的数据都已经被正常接收。**用来解决丢包的问题。**
+
+      **控制位：**
+
+      - *ACK*：该位为 `1` 时，「确认应答」的字段变为有效，TCP 规定除了最初建立连接时的 `SYN` 包之外该位必须设置为 `1` 。
+      - *RST*：该位为 `1` 时，表示 TCP 连接中出现异常必须强制断开连接。
+      - *SYN*：该位为 `1` 时，表示希望建立连接，并在其「序列号」的字段进行序列号初始值的设定。
+      - *FIN*：该位为 `1` 时，表示今后不会再有数据发送，希望断开连接。当通信结束希望断开连接时，通信双方的主机之间就可以相互交换 `FIN` 位为 1 的 TCP 段。
+
+   4. TCP和UDP的区别
+
+      |          | TCP                  | UDP                                |
+      | -------- | -------------------- | ---------------------------------- |
+      | 连接     | 建立连接后传输       | 直接传输                           |
+      | 可靠性   | 可靠的               | 不可靠                             |
+      | 服务对象 | 一对一               | 单播、多播、广播                   |
+      | 首部     | 20字节               | 8字节                              |
+      | 应用场景 | 文件传输、HTTP/HTTPS | 视频音频、广播通信、数据量少的通信 |
+
+#### TCP建立连接
+
+1. 建立连接的流程
+
+   <img src="./ref_img/TCP三次握手.drawio.png">
+
+      客户端SYN=1,seq=client_isn->服务器端
+      客户端<-服务器端SYN=1,ACK=1,seq=server_isn,ack_num=client_isn+1
+      客户端（established）ACK=1,ack_num=server_isn+1->服务器端（established）
+      其中第三次握手是可以携带数据的，而前两次握手则不携带数据
+
+      [4.1 TCP 三次握手与四次挥手面试题 | 小林coding (xiaolincoding.com)](https://xiaolincoding.com/network/3_tcp/tcp_interview.html#tcp-三次握手过程是怎样的)
+
+   2. 解释三次握手的原因
+
+      避免和客户端发送的历史SYN建立TCP连接，而导致的资源浪费。
+
+      服务器端接收历史SYN后，所发送的ACK_NUM和客户端期待的不一致，客户端会发送RST终止连接的建立。
+
+   3. 解释四次握手是怎么合并为三次握手的
+
+      可以在服务器回复客户端时，同时发送对于客户端序列号的确认以及服务器自身的序列号的初始化
+
+      ACK=1（确认报文号有效）: ack_num=client_isn+1（“确认报文号”字段的值）
+
+      SYN=1（希望建立连接）：seq_num=server_isn（“序列号”字段初始值）
+
+   4. 为什么每次建立TCP连接时，初始的序列号都不一致
+
+      - 避免伪造TCP报文
+      - 避免接收历史报文
+
+   5. 三次握手中的超时重传
+
+      超时重传的等待时间和重传报文的次数是在操作系统中设定的，超时重传等待时间是上一次等待时间的2倍
+
+      1. 第一次握手一直丢失：客户端会一直重传SYN报文直到次数用完，最后等待时间结束后，TCP连接断开
+
+      2. 第二次握手一直丢失：客户端会重传SYN报文，服务器端会重传SYN+ACK报文，但是都接收不到确认报文，各自的最后等待时间结束后，都会断开TCP连接
+
+      3. 第三次握手一直丢失：客户端接收到SYN+ACK报文后进入连接建立状态，但是服务器端接收不到ACK报文会一直超时重传SYN+ACK报文，最后等待时间结束后，服务器会断开TCP连接
+
+         注意第三次握手是不会重传的，也就是ACK报文是不会重传的
+
+   6. SYN攻击
+
+      让服务器端的半连接队列（SYN队列）被占满，而无法和后续的客户端产生连接
+
+      解决方案：
+
+      - 减少SYN+ACK报文的重传次数，促使TCP连接尽快结束
+      - 增大服务器端的半连接队列
+
+#### TCP断开连接
+
+1. 四次挥手的流程
+
+   双方都可以主动断开连接，下面以客户端断开连接为例：
+
+   client FIN->server
+
+   client FIN_WAIT_1：等待对方确认fin报文，此时主动方不能发送数据了，但还能接收数据
+
+   server ACK->client
+
+   server CLOSED_WAIT, client FIN_WAIT_2：这段时间被通知方端可能还有数据需要处理发送
+
+   server FIN->client：数据处理完成，像主动方发送fin报文
+
+   server LAST_ACK：等待主动方对fin报文的确认
+
+   client ACK->server
+
+   （接收到FIN，发送ACK后开始计时）client TIME_WAIT（=2MSL）：主动关闭连接的，才有TIME_WAIT状态
+
+   （收到ACK）server CLOSED
+
+   （计时结束）client CLOSED
+
+2. 为什么挥手四次？
+
+   首先双方都需要发送FIN报文，对方都需要对fin报文发送ACK确认报文
+
+   四次挥手主要是对于主动方的FIN报文，被动方的ACK报文和FIN报文分开发送，这中间被动方可能还有数据需要处理发送，所以是四次挥手
+
+3. 四次挥手的丢失
+
+   首先FIN报文是会超时重传的，ACK报文是不会超时重传的
+
+   通常情况下FIN_WAIT是有超时控制的，如果超过了时间就会自动关闭连接
+
+   如果接收到了新的FIN报文，TIME_WAIT的2MSL定时器会重置
+
+   其他情况按照三次握手进行推理即可
+
+4. MSL是什么，为什么将TIME_WAIT设为2MSL
+
+   maximum segment lifetime，报文最大生存时间，是任何报文在网络上存在的最长时间
+
+   2MSL设置的含义：至少允许报文丢失一次，如果最后确认ACK在第一个MSL中丢失，被动方重传的FIN就可以在第二个MSL中到达，此时计时器重置，依然是倒计时2MSL
+
+5. 设置TIME_WAIT的原因
+
+   1. 保证被动的一方能够被符合流程的关闭：也就是如果对于被动方的ACK报文丢失，被动方将重传FIN报文，而主动方正好在2MSL时间中接收重传的FIN报文
+   2. 防止历史连接中产生的数据，在新的四元组连接中被接收：2MSL的时长足够让两个方向上的历史数据包都被丢弃，因此接收不到历史数据包
+
+6. 过多TIME_WAIT的危害
+
+   1. 占用系统资源
+   2. 占用端口资源
 
 ### HTTP基础知识
 
